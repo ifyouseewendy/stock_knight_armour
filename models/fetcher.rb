@@ -7,7 +7,7 @@ class Fetcher
   attr_reader :manager, :client, :stock
 
   def initialize(manager)
-    puts '--> Fetcher: initialize'
+    # puts '--> Fetcher: initialize'
     @manager = manager
 
     @client = StockKnight::Client.new(ENV['APIKEY'])
@@ -22,14 +22,14 @@ class Fetcher
   end
 
   def fetch
-    puts '--> Fetcher: start fetch'
+    # puts '--> Fetcher: start fetch'
     work = client.quote_of(stock)
 
     if work[:ok]
-      puts '--> Fetcher: done fetch'
+      # puts '--> Fetcher: done fetch'
       manager.assign(work)
     else
-      puts "Failed fethcing: #{work[:error]}"
+      # puts "Failed fethcing: #{work[:error]}"
     end
   end
 end

@@ -5,13 +5,13 @@ class Processor
   include Celluloid
 
   def initialize
-    puts '--> Processor: initialize'
+    # puts '--> Processor: initialize'
   end
 
   def process(work)
-    puts '--> Processor: start process'
+    # puts '--> Processor: start process'
     Quote.create work.except(:ok)
-    puts '--> Processor: end process'
+    # puts '--> Processor: end process'
   end
 end
 
