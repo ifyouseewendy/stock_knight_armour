@@ -6,6 +6,12 @@ Mongoid.load!("config/mongoid.yml", :development)
 require File.expand_path('../../models/models', __FILE__)
 
 manager = Manager.new
-loop do
-  manager.dispatch
+
+Thread.new do
+  loop do
+    manager.dispatch
+  end
 end
+
+sleep(10)
+manager.terminate

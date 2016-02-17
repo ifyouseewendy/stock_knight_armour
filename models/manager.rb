@@ -3,23 +3,39 @@ require_relative 'processor'
 require_relative 'quote'
 
 class Manager
-  attr_reader :fetcher, :processor
+  attr_reader :fetcher, :processor, :start_time
+  attr_accessor :counter
 
   def initialize
     @fetcher   = Fetcher.pool(args: self)   # size default to system cores count
     @processor = Processor.pool
 
+    @counter   = 0
+    @start_time = Time.now.to_i
+
     clean_db
   end
 
   def dispatch
-    puts '--> Manager: start dispatch'
+    # puts '--> Manager: start dispatch'
     fetcher.async.fetch
   end
 
   def assign(work)
-    puts '--> Manager: start assign'
+    # puts '--> Manager: start assign'
     processor.async.process(work)
+
+    self.counter += 1
+  end
+
+  def terminate
+    fetcher.terminate
+    processor.terminate
+
+    seconds = Time.now.to_i - start_time
+    count = (counter / seconds.to_f).round(2)
+
+    puts "--> Run #{seconds}s, get #{counter} iterations, avg #{count} i/s"
   end
 
   private
