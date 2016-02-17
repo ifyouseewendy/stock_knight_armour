@@ -1,0 +1,6 @@
+development:
+  clients:
+    default:
+      database: stock_knight_armour
+      hosts:
+        - localhost:27018
