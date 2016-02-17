@@ -23,6 +23,24 @@ end
 
 class Manager
   include Celluloid
+
+  attr_reader :client, :stock
+
+  def initialize
+    @client = StockKnight::Client.new(ENV['APIKEY'])
+
+    @client.configure do |config|
+      config.account      = ENV['ACCOUNT']
+      config.venue        = ENV['VENUE']
+      config.debug_output = true #  Log request and response info
+    end
+
+    @stock = 'FOOBAR'
+  end
+
+  def fetch
+
+  end
 end
 
 get '/' do
