@@ -8,7 +8,7 @@ get '/' do
 end
 
 get '/quotes' do
-  quotes = Quote.all.to_a
+  quotes = Quote.order_by(lastTrade: :asc).to_a
 
   {
     xData: (1..quotes.count).to_a,

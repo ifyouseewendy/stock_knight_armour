@@ -11,6 +11,6 @@ class Quote
   field :askDepth,    type: Integer
   field :last,        type: Integer
   field :lastSize,    type: Integer
-  field :lastTrade,   type: String
+  field :lastTrade,   type: String # Index by db.quotes.createIndex( { lastTrade: 1 }, { background: true } )
   field :quoteTime,   type: String
 end
