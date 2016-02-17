@@ -5,10 +5,7 @@ require 'mongoid'
 Mongoid.load!("config/mongoid.yml", :development)
 require File.expand_path('../../models/models', __FILE__)
 
-begin
-  require "pry"
-  Pry.start
-rescue LoadError
-  require "irb"
-  IRB.start
+manager = Manager.new
+loop do
+  manager.dispatch
 end
