@@ -11,6 +11,6 @@ class Quote
   field :askDepth,    type: Integer
   field :last,        type: Integer
   field :lastSize,    type: Integer
-  field :lastTrade,   type: Time
-  field :quoteTime,   type: Time
+  field :lastTrade,   type: String
+  field :quoteTime,   type: String
 end
