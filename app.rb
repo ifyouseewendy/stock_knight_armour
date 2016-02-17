@@ -28,6 +28,8 @@ class Manager
   def initialize
     @fetcher   = Fetcher.pool(args: self)   # size default to system cores count
     @processor = Processor.pool
+
+    clean_db
   end
 
   def dispatch
@@ -39,6 +41,12 @@ class Manager
     puts '--> Manager: start assign'
     processor.async.process(work)
   end
+
+  private
+
+    def clean_db
+      Quote.destroy_all
+    end
 end
 
 class Fetcher
@@ -83,8 +91,7 @@ class Processor
 
   def process(work)
     puts '--> Processor: start process'
-    # Write to mongo
-    p work
+    Quote.create work.except(:ok)
     puts '--> Processor: end process'
   end
 end
@@ -94,6 +101,6 @@ loop do
   manager.dispatch
 end
 
-# get '/' do
-#   "Hello world! #{User.count}"
-# end
+get '/' do
+  "Hello world! #{User.count}"
+end
