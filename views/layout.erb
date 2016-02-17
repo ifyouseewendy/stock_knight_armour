@@ -1,0 +1,27 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stock Knight Console</title>
+
+    <style>
+        .chart {
+        min-width: 320px;
+        max-width: 800px;
+        height: 220px;
+        margin: 0 auto;
+    }
+    </style>
+
+    <script src="jquery-1.9.1.js"></script>
+    <script src="highcharts-4.2.3.js"></script>
+  </head>
+
+  <body>
+    <div id='container'>
+      <%= yield %>
+    </div>
+
+  </body>
+</html>
