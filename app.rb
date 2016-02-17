@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'celluloid/current'
+require 'stock_knight'
 require 'mongoid'
 $:.unshift File.join(__FILE__, "../config")
 Mongoid.load!("config/mongoid.yml", :development)
@@ -22,27 +23,77 @@ class Quote
 end
 
 class Manager
-  include Celluloid
-
-  attr_reader :client, :stock
+  attr_reader :fetcher, :processor
 
   def initialize
+    @fetcher   = Fetcher.pool(args: self)   # size default to system cores count
+    @processor = Processor.pool
+  end
+
+  def dispatch
+    puts '--> Manager: start dispatch'
+    fetcher.async.fetch
+  end
+
+  def assign(work)
+    puts '--> Manager: start assign'
+    processor.async.process(work)
+  end
+end
+
+class Fetcher
+  include Celluloid
+
+  attr_reader :manager, :client, :stock
+
+  def initialize(manager)
+    puts '--> Fetcher: initialize'
+    @manager = manager
+
     @client = StockKnight::Client.new(ENV['APIKEY'])
 
     @client.configure do |config|
       config.account      = ENV['ACCOUNT']
       config.venue        = ENV['VENUE']
-      config.debug_output = true #  Log request and response info
+      config.debug_output = false #  Log request and response info
     end
 
-    @stock = 'FOOBAR'
+    @stock = ENV['STOCK']
   end
 
   def fetch
+    puts '--> Fetcher: start fetch'
+    work = client.quote_of(stock)
 
+    if work[:ok]
+      puts '--> Fetcher: done fetch'
+      manager.assign(work)
+    else
+      puts "Failed fethcing: #{work[:error]}"
+    end
   end
 end
 
-get '/' do
-  "Hello world! #{User.count}"
+class Processor
+  include Celluloid
+
+  def initialize
+    puts '--> Processor: initialize'
+  end
+
+  def process(work)
+    puts '--> Processor: start process'
+    # Write to mongo
+    p work
+    puts '--> Processor: end process'
+  end
 end
+
+manager = Manager.new
+loop do
+  manager.dispatch
+end
+
+# get '/' do
+#   "Hello world! #{User.count}"
+# end
