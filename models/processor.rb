@@ -10,7 +10,10 @@ class Processor
 
   def process(work)
     # puts '--> Processor: start process'
-    Quote.create work.except(:ok)
+    begin
+      Quote.create work.except(:ok)
+    rescue Mongo::Error::OperationFailure => e
+    end
     # puts '--> Processor: end process'
   end
 end
