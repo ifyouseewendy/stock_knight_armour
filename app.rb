@@ -14,30 +14,37 @@ get '/quotes' do
     xData: (1..quotes.count).to_a,
     datasets: [
       {
-        name: 'Last',
+        name: 'last',
         data: quotes.map(&:last),
-        type: 'line',
       },
       {
-        name: 'Bid',
+        name: 'lastSize',
+        data: quotes.map(&:lastSize),
+      },
+      {
+        name: 'bid',
         data: quotes.map(&:bid),
-        type: 'line',
       },
       {
-        name: 'BidDepth',
+        name: 'bidSize',
+        data: quotes.map(&:bidSize),
+      },
+      {
+        name: 'bidDepth',
         data: quotes.map(&:bidDepth),
-        type: 'area',
       },
       {
-        name: 'Ask',
+        name: 'ask',
         data: quotes.map(&:ask),
-        type: 'line',
       },
       {
-        name: 'AskDepth',
+        name: 'askSize',
+        data: quotes.map(&:askSize),
+      },
+      {
+        name: 'askDepth',
         data: quotes.map(&:askDepth),
-        type: 'area',
-      }
+      },
     ]
   }.to_json
 end

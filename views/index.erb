@@ -72,77 +72,13 @@ $(function () {
             .appendTo('#container')
             .highcharts({
                 chart: {
-                    marginLeft: 40, // Keep all charts left aligned
-                    spacingTop: 20,
-                    spacingBottom: 20
-                },
-                title: {
-                    text: datasets[0].name,
-                    align: 'left',
-                    margin: 0,
-                    x: 30
-                },
-                credits: {
-                    enabled: false
-                },
-                legend: {
-                    enabled: false
-                },
-                xAxis: {
-                    crosshair: true,
-                    events: {
-                        setExtremes: syncExtremes
-                    },
-                    labels: {
-                        format: '{value}'
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: null
-                    }
-                },
-                tooltip: {
-                    positioner: function () {
-                        return {
-                            x: this.chart.chartWidth - this.label.width, // right aligned
-                            y: -1 // align to title
-                        };
-                    },
-                    borderWidth: 0,
-                    backgroundColor: 'none',
-                    pointFormat: '{point.y}',
-                    headerFormat: '',
-                    shadow: false,
-                    style: {
-                        fontSize: '18px'
-                    },
-                    valueDecimals: 0
-                },
-                series: [{
-                    data: datasets[0].data,
-                    name: datasets[0].name,
-                    type: datasets[0].type,
-                    color: Highcharts.getOptions().colors[0],
-                    fillOpacity: 0.3,
-                    tooltip: {
-                        valueSuffix: ''
-                    }
-                }]
-            });
-
-        // Bid chart
-        $('<div class="chart">')
-            .appendTo('#container')
-            .highcharts({
-                chart: {
                     zoomType: 'xy',
                     marginLeft: 40, // Keep all charts left aligned
                     spacingTop: 20,
                     spacingBottom: 20
                 },
                 title: {
-                    text: datasets[1].name,
+                    text: datasets[0].name,
                     align: 'left',
                     margin: 0,
                     x: 30
@@ -166,19 +102,17 @@ $(function () {
                   {
                     title: {
                         text: null,
-                        style: {
-                            color: Highcharts.getOptions().colors[1]
-                        }
                     }
                   },
                   {
                     title: {
                         text: null,
-                        style: {
-                            color: Highcharts.getOptions().colors[0]
-                        }
+                    }
+                  },
+                  {
+                    title: {
+                        text: null,
                     },
-                    opposite: true
                   }
                 ],
                 tooltip: {
@@ -198,12 +132,21 @@ $(function () {
                     },
                     valueDecimals: 0,
                 },
+                plotOptions: {
+                    column: {
+                        grouping: false,
+                        shadow: false,
+                        borderWidth: 0
+                    }
+                },
                 series: [
                   {
-                    name: 'Depth',
+                    name: 'Size',
                     type: 'column',
                     yAxis: 1,
-                    data: datasets[2].data,
+                    pointPadding: 0.3,
+                    data: datasets[1].data,
+                    color: 'rgba(126,86,134,.9)',
                     tooltip: {
                         valueSuffix: ''
                     }
@@ -211,7 +154,114 @@ $(function () {
                   {
                     name: 'Price',
                     type: 'spline',
-                    data: datasets[1].data,
+                    data: datasets[0].data,
+                    color: Highcharts.getOptions().colors[1],
+                    tooltip: {
+                        valueSuffix: ' $'
+                    }
+                  },
+                ]
+            });
+
+        // Bid chart
+        $('<div class="chart">')
+            .appendTo('#container')
+            .highcharts({
+                chart: {
+                    zoomType: 'xy',
+                    marginLeft: 40, // Keep all charts left aligned
+                    spacingTop: 20,
+                    spacingBottom: 20
+                },
+                title: {
+                    text: datasets[2].name,
+                    align: 'left',
+                    margin: 0,
+                    x: 30
+                },
+                credits: {
+                    enabled: false
+                },
+                legend: {
+                    enabled: false
+                },
+                xAxis: [{
+                    crosshair: true,
+                    events: {
+                        setExtremes: syncExtremes
+                    },
+                    labels: {
+                        format: '{value}'
+                    }
+                }],
+                yAxis: [
+                  {
+                    title: {
+                        text: null,
+                    }
+                  },
+                  {
+                    title: {
+                        text: null,
+                    }
+                  },
+                  {
+                    title: {
+                        text: null,
+                    },
+                  }
+                ],
+                tooltip: {
+                    positioner: function () {
+                        return {
+                            x: this.chart.chartWidth - this.label.width, // right aligned
+                            y: -1 // align to title
+                        };
+                    },
+                    borderWidth: 0,
+                    backgroundColor: 'none',
+                    pointFormat: '{point.y}',
+                    headerFormat: '',
+                    shadow: false,
+                    style: {
+                        fontSize: '18px'
+                    },
+                    valueDecimals: 0,
+                },
+                plotOptions: {
+                    column: {
+                        grouping: false,
+                        shadow: false,
+                        borderWidth: 0
+                    }
+                },
+                series: [
+                  {
+                    name: 'Depth',
+                    type: 'column',
+                    yAxis: 1,
+                    data: datasets[4].data,
+                    color: Highcharts.getOptions().colors[0],
+                    tooltip: {
+                        valueSuffix: ''
+                    }
+                  },
+                  {
+                    name: 'Size',
+                    type: 'column',
+                    yAxis: 1,
+                    pointPadding: 0.3,
+                    data: datasets[3].data,
+                    color: 'rgba(126,86,134,.9)',
+                    tooltip: {
+                        valueSuffix: ''
+                    }
+                  },
+                  {
+                    name: 'Price',
+                    type: 'spline',
+                    data: datasets[2].data,
+                    color: Highcharts.getOptions().colors[1],
                     tooltip: {
                         valueSuffix: ' $'
                     }
@@ -230,7 +280,7 @@ $(function () {
                     spacingBottom: 20
                 },
                 title: {
-                    text: datasets[3].name,
+                    text: datasets[5].name,
                     align: 'left',
                     margin: 0,
                     x: 30
@@ -254,19 +304,17 @@ $(function () {
                   {
                     title: {
                         text: null,
-                        style: {
-                            color: Highcharts.getOptions().colors[1]
-                        }
                     }
                   },
                   {
                     title: {
                         text: null,
-                        style: {
-                            color: Highcharts.getOptions().colors[0]
-                        }
+                    }
+                  },
+                  {
+                    title: {
+                        text: null,
                     },
-                    opposite: true
                   }
                 ],
                 tooltip: {
@@ -286,12 +334,31 @@ $(function () {
                     },
                     valueDecimals: 0,
                 },
+                plotOptions: {
+                    column: {
+                        grouping: false,
+                        shadow: false,
+                        borderWidth: 0
+                    }
+                },
                 series: [
                   {
                     name: 'Depth',
                     type: 'column',
                     yAxis: 1,
-                    data: datasets[4].data,
+                    data: datasets[7].data,
+                    color: Highcharts.getOptions().colors[0],
+                    tooltip: {
+                        valueSuffix: ''
+                    }
+                  },
+                  {
+                    name: 'Size',
+                    type: 'column',
+                    yAxis: 1,
+                    pointPadding: 0.3,
+                    data: datasets[6].data,
+                    color: 'rgba(126,86,134,.9)',
                     tooltip: {
                         valueSuffix: ''
                     }
@@ -299,7 +366,8 @@ $(function () {
                   {
                     name: 'Price',
                     type: 'spline',
-                    data: datasets[3].data,
+                    data: datasets[5].data,
+                    color: Highcharts.getOptions().colors[1],
                     tooltip: {
                         valueSuffix: ' $'
                     }
