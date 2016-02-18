@@ -1,14 +1,16 @@
 require_relative 'fetcher'
 require_relative 'processor'
 require_relative 'quote'
+require_relative 'dealer'
 
 class Manager
-  attr_reader :fetcher, :processor, :start_time
+  attr_reader :fetcher, :processor, :dealer, :start_time
   attr_accessor :counter
 
   def initialize
     @fetcher   = Fetcher.pool(size: 128, args: self)   # size default to system cores count
     @processor = Processor.pool(size: 64)
+    @dealer    = Dealer.pool
 
     @counter   = 0
     @start_time = Time.now.to_i
@@ -36,6 +38,10 @@ class Manager
     count = (counter / seconds.to_f).round(2)
 
     puts "--> Run #{seconds}s, get #{counter} iterations, avg #{count} i/s"
+  end
+
+  def deal
+    dealer.async.deal
   end
 
   private

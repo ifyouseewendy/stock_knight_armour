@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require 'mongoid'
+Mongoid.load!("config/mongoid.yml", :development)
+require File.expand_path('../../models/models', __FILE__)
+
+manager = Manager.new
+
+loop do
+  manager.deal
+end
