@@ -7,8 +7,8 @@ class Manager
   attr_accessor :counter
 
   def initialize
-    @fetcher   = Fetcher.pool(args: self)   # size default to system cores count
-    @processor = Processor.pool
+    @fetcher   = Fetcher.pool(size: 128, args: self)   # size default to system cores count
+    @processor = Processor.pool(size: 64)
 
     @counter   = 0
     @start_time = Time.now.to_i

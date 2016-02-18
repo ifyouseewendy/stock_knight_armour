@@ -7,11 +7,13 @@ require File.expand_path('../../models/models', __FILE__)
 
 manager = Manager.new
 
-Thread.new do
+tr = Thread.new do
   loop do
     manager.dispatch
   end
 end
 
-sleep(10)
+sleep(30)
 manager.terminate
+
+tr.join

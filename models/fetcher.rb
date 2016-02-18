@@ -22,14 +22,14 @@ class Fetcher
   end
 
   def fetch
-    # puts '--> Fetcher: start fetch'
+    puts '--> Fetcher: start fetch'
     work = client.quote_of(stock)
 
     if work[:ok]
-      # puts '--> Fetcher: done fetch'
+      puts '--> Fetcher: done fetch'
       manager.assign(work)
     else
-      # puts "Failed fethcing: #{work[:error]}"
+      puts "--> Fetcher: failed fetch, #{work[:error]}"
     end
   end
 end
