@@ -15,16 +15,21 @@ $(function () {
     $('#container').bind('mousemove touchmove touchstart', function (e) {
         var chart,
             point,
-            i;
+            i, j;
 
         for (i = 0; i < Highcharts.charts.length; i = i + 1) {
             chart = Highcharts.charts[i];
             e = chart.pointer.normalize(e.originalEvent); // Find coordinates within the chart
             point = chart.series[0].searchPoint(e, true); // Get the hovered point
+            points = [point]
+            for (j = 1; j < chart.series.length; j = j + 1) {
+              pp = chart.series[j].searchPoint(e, true);
+              points.push(pp);
+            }
 
             if (point) {
                 point.onMouseOver(); // Show the hover marker
-                chart.tooltip.refresh(point); // Show the tooltip
+                chart.tooltip.refresh(points); // Show the tooltip
                 chart.xAxis[0].drawCrosshair(e, point); // Show the crosshair
             }
         }
@@ -116,21 +121,14 @@ $(function () {
                   }
                 ],
                 tooltip: {
-                    positioner: function () {
-                        return {
-                            x: this.chart.chartWidth - this.label.width, // right aligned
-                            y: -1 // align to title
-                        };
+                    shared: true,
+                    formatter: function() {
+                        var s = [];
+                        $.each(this.points, function(i, point) {
+                          s.push(point.series.name +' : '+'<span style="color:#D31B22;font-weight:bold;">' + point.y +'</span>');
+                        });
+                        return s.join('<br/>');
                     },
-                    borderWidth: 0,
-                    backgroundColor: 'none',
-                    pointFormat: '{point.y}',
-                    headerFormat: '',
-                    shadow: false,
-                    style: {
-                        fontSize: '18px'
-                    },
-                    valueDecimals: 0,
                 },
                 plotOptions: {
                     column: {
@@ -206,21 +204,14 @@ $(function () {
                   }
                 ],
                 tooltip: {
-                    positioner: function () {
-                        return {
-                            x: this.chart.chartWidth - this.label.width, // right aligned
-                            y: -1 // align to title
-                        };
+                    shared: true,
+                    formatter: function() {
+                        var s = [];
+                        $.each(this.points, function(i, point) {
+                          s.push(point.series.name +' : '+'<span style="color:#D31B22;font-weight:bold;">' + point.y +'</span>');
+                        });
+                        return s.join('<br/>');
                     },
-                    borderWidth: 0,
-                    backgroundColor: 'none',
-                    pointFormat: '{point.y}',
-                    headerFormat: '',
-                    shadow: false,
-                    style: {
-                        fontSize: '18px'
-                    },
-                    valueDecimals: 0,
                 },
                 plotOptions: {
                     column: {
@@ -303,21 +294,14 @@ $(function () {
                   }
                 ],
                 tooltip: {
-                    positioner: function () {
-                        return {
-                            x: this.chart.chartWidth - this.label.width, // right aligned
-                            y: -1 // align to title
-                        };
+                    shared: true,
+                    formatter: function() {
+                        var s = [];
+                        $.each(this.points, function(i, point) {
+                          s.push(point.series.name +' : '+'<span style="color:#D31B22;font-weight:bold;">' + point.y +'</span>');
+                        });
+                        return s.join('<br/>');
                     },
-                    borderWidth: 0,
-                    backgroundColor: 'none',
-                    pointFormat: '{point.y}',
-                    headerFormat: '',
-                    shadow: false,
-                    style: {
-                        fontSize: '18px'
-                    },
-                    valueDecimals: 0,
                 },
                 plotOptions: {
                     column: {
