@@ -141,24 +141,18 @@ $(function () {
                 },
                 series: [
                   {
-                    name: 'Size',
+                    name: 'lastSize',
                     type: 'column',
                     yAxis: 1,
                     pointPadding: 0.3,
                     data: datasets[1].data,
                     color: 'rgba(126,86,134,.9)',
-                    tooltip: {
-                        valueSuffix: ''
-                    }
                   },
                   {
-                    name: 'Price',
+                    name: 'last',
                     type: 'spline',
                     data: datasets[0].data,
                     color: Highcharts.getOptions().colors[1],
-                    tooltip: {
-                        valueSuffix: ' $'
-                    }
                   },
                 ]
             });
@@ -237,34 +231,25 @@ $(function () {
                 },
                 series: [
                   {
-                    name: 'Depth',
+                    name: 'bidDepth',
                     type: 'column',
                     yAxis: 1,
                     data: datasets[4].data,
                     color: Highcharts.getOptions().colors[0],
-                    tooltip: {
-                        valueSuffix: ''
-                    }
                   },
                   {
-                    name: 'Size',
+                    name: 'bidSize',
                     type: 'column',
                     yAxis: 1,
                     pointPadding: 0.3,
                     data: datasets[3].data,
                     color: 'rgba(126,86,134,.9)',
-                    tooltip: {
-                        valueSuffix: ''
-                    }
                   },
                   {
-                    name: 'Price',
+                    name: 'bid',
                     type: 'spline',
                     data: datasets[2].data,
                     color: Highcharts.getOptions().colors[1],
-                    tooltip: {
-                        valueSuffix: ' $'
-                    }
                   },
                 ]
             });
@@ -343,34 +328,25 @@ $(function () {
                 },
                 series: [
                   {
-                    name: 'Depth',
+                    name: 'askDepth',
                     type: 'column',
                     yAxis: 1,
                     data: datasets[7].data,
                     color: Highcharts.getOptions().colors[0],
-                    tooltip: {
-                        valueSuffix: ''
-                    }
                   },
                   {
-                    name: 'Size',
+                    name: 'askSize',
                     type: 'column',
                     yAxis: 1,
                     pointPadding: 0.3,
                     data: datasets[6].data,
                     color: 'rgba(126,86,134,.9)',
-                    tooltip: {
-                        valueSuffix: ''
-                    }
                   },
                   {
-                    name: 'Price',
+                    name: 'ask',
                     type: 'spline',
                     data: datasets[5].data,
                     color: Highcharts.getOptions().colors[1],
-                    tooltip: {
-                        valueSuffix: ' $'
-                    }
                   },
                 ]
             });
