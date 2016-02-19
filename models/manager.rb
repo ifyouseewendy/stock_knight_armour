@@ -16,8 +16,6 @@ class Manager
 
     @dealers    = 16.times.map{ Dealer.new }
     @profit     = 0
-
-    clean_db
   end
 
   def dispatch
@@ -46,7 +44,8 @@ class Manager
     futures = []
 
     dealers.each do |dealer|
-      futures << dealer.future.buy_low
+      sleep(rand(2))
+      futures << dealer.async.deal
     end
 
     self.profit += (futures.map(&:value).map(&:to_i).sum / 100.0).round(2)
@@ -54,10 +53,8 @@ class Manager
     puts "--> profit: #{profit}"
   end
 
-  private
-
-    def clean_db
-      Quote.destroy_all
-    end
+  def clean_db
+    Quote.destroy_all
+  end
 end
 
