@@ -5,10 +5,6 @@ class Dealer
   include Celluloid
 
   attr_reader :client, :stock
-  attr_accessor :share
-
-  MAX = 200
-  RECENT = 5
 
   def initialize
     @client = StockKnight::Client.new(ENV['APIKEY'])
@@ -20,75 +16,31 @@ class Dealer
     end
 
     @stock = ENV['STOCK']
+  end
 
-    @share = 0
+  def buy_low
+    price = buy_in_price
+    return if price == 0
+
+    price += 10
+    amount = buy(price: price, qty: 60, type: :limit)
+    if amount > 0
+      sell(price: price+300, qty: amount, type: :limit, base: price*amount)
+    else
+      0
+    end
   end
 
   def deal
-    puts "--> Start dealing"
-    begin
-      profit = 0
-      round = 0
+    return if last_quote.nil?
+    return if last_bid == 0
 
-      loop do
-        next if last_quote.nil?
-
-        bid = last_ask + 200
-        ask = bid + 200
-
-        filled = 0
-        puts "##{id}-#{round} --> buy"
-        order = client.buy(stock, price: bid, qty: 200, type: :limit)[:id]
-
-        puts "##{id}-#{round} --> sleep"
-        sleep(3)
-        resp = client.query(stock, order: order)
-        bought = resp[:totalFilled].to_i
-        p resp
-
-        puts "##{id}-#{round} --> bought: #{bought}"
-        if bought == 0
-          resp = client.cancel(stock, order: order)
-          bought = resp[:totalFilled].to_i
-
-          if bought == 0
-            next
-          end
-        end
-
-        filled += bought
-        puts "##{id}-#{round} --> bought #{bought} at #{bid}, filled: #{filled}"
-        profit -= bought * bid
-
-        loop do
-          ask -= 10
-          order = client.sell(stock, price: ask, qty: filled, type: :limit)[:id]
-          sleep(2)
-          resp = client.query(stock, order: order)
-          sold = resp[:totalFilled].to_i
-
-          if sold == 0
-            resp = client.cancel(stock, order: order)
-            sold = resp[:totalFilled].to_i
-
-            if sold == 0
-              next
-            end
-          end
-
-          filled -= sold
-          puts "##{id}-#{round} --> Sold: #{sold} at #{ask}, filled: #{filled}"
-          profit += sold * ask
-
-          break if filled == 0
-        end
-
-        puts "##{id}-#{round} --> profit: #{profit}"
-        round += 1
-      end
-    rescue => e
-      puts e.message
-      retry
+    price = last_bid + 10
+    amount = buy(price: price, qty: 200, type: :limit)
+    if amount > 0
+      sell(price: price+200, qty: amount, type: :limit, base: price*amount)
+    else
+      0
     end
   end
 
@@ -105,11 +57,94 @@ class Dealer
   end
 
   def last_bid
-    last_quote.bid
+    (last_quote.bid * 100).to_i
   end
 
   def last_ask
-    last_quote.bid
+    (last_quote.ask * 100).to_i
+  end
+
+  def buy_in_price
+    prices = collection.limit(3).pluck(:bid).reject(&:zero?)
+    sum = prices.sum
+    return 0 if sum.zero?
+
+    (sum * 100.0 / prices.count).to_i
+  end
+
+  def buy(price:, qty:, type:)
+    puts "#{id} --> buy #{qty} at #{price}"
+    order = client.buy(stock, price: price, qty: qty, type: type)[:id]
+
+    # puts "#{id} --> sleep"
+    # sleep( rand(1) )
+    resp = client.query(stock, order: order)
+    amount = resp[:totalFilled].to_i
+
+    if amount == 0
+      resp = client.cancel(stock, order: order)
+      amount = resp[:totalFilled].to_i
+
+      if amount.zero?
+        puts "#{id} --> amount 0"
+        return 0
+      end
+    end
+
+    # orders << Order.new(:buy, amount, price)
+    puts "#{id} --> bought #{amount} at #{price}"
+
+    return amount
+  end
+
+  def sell(price:, qty:, type:, base:)
+    puts "#{id} --> sell #{qty} at #{price}"
+
+    sum = 0
+    loop do
+      order = client.sell(stock, price: price, qty: qty, type: type)[:id]
+
+      # sleep( rand(1) )
+      resp = client.query(stock, order: order)
+      amount = resp[:totalFilled].to_i
+
+      if amount == 0
+        resp = client.cancel(stock, order: order)
+        amount = resp[:totalFilled].to_i
+
+        if amount.zero?
+          price -= 20
+          next
+        end
+      end
+
+      # orders << Order.new(:sell, amount, price)
+      puts "#{id} --> sold #{amount} at #{price}"
+
+      sum += amount*price
+
+      qty -= amount
+      price -= 20
+      break if qty == 0
+    end
+
+    puts "#{id} --> profit: #{sum-base}"
+    sum - base
+  end
+
+  def orders
+    Thread.current[:orders] ||= []
+    Thread.current[:orders]
+  end
+
+  Order = Struct.new(:op, :amount, :price) do
+    def profit
+      if op == :buy
+        0 - (amount * price)
+      else
+        amount * price
+      end
+    end
   end
 
 end

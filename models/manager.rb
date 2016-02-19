@@ -4,16 +4,18 @@ require_relative 'quote'
 require_relative 'dealer'
 
 class Manager
-  attr_reader :fetcher, :processor, :dealer, :start_time
-  attr_accessor :counter
+  attr_reader :fetcher, :processor, :dealers, :start_time
+  attr_accessor :counter, :profit
 
   def initialize
-    @fetcher   = Fetcher.pool(size: 128, args: self)   # size default to system cores count
-    @processor = Processor.pool(size: 64)
-    @dealer    = Dealer.pool
+    @fetcher    = Fetcher.pool(size: 2, args: self)   # size default to system cores count
+    @processor  = Processor.pool(size: 2)
 
-    @counter   = 0
+    @counter    = 0
     @start_time = Time.now.to_i
+
+    @dealers    = 16.times.map{ Dealer.new }
+    @profit     = 0
 
     clean_db
   end
@@ -41,7 +43,15 @@ class Manager
   end
 
   def deal
-    dealer.async.deal
+    futures = []
+
+    dealers.each do |dealer|
+      futures << dealer.future.buy_low
+    end
+
+    self.profit += (futures.map(&:value).map(&:to_i).sum / 100.0).round(2)
+
+    puts "--> profit: #{profit}"
   end
 
   private
