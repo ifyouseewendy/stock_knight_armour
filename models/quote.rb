@@ -19,18 +19,18 @@ class Quote
       return 0 if Quote.count < 6
 
       sample = Quote.order_by(lastTrade: :desc).limit(6)
+      last_price = sample.first.try(:ask)
 
-      last_bid = sample.first.bid
-
-      bids    = sample.pluck(:bid).reject(&:zero?).sort
-      range   = bids.count / 3
-      avg_bid = bids[range, range].avg
+      prices    = sample.pluck(:ask).reject(&:zero?).sort
+      range   = prices.count / 3
+      avg_price = prices[range, range].avg
 
       valid_rate = 0.05
-      if last_bid >= avg_bid*(1-valid_rate) && last_bid <= avg_bid*(1+valid_rate)
-        [last_bid, avg_bid].avg
+      if last_price >= avg_price*(1-valid_rate) && last_price <= avg_price*(1+valid_rate)
+        [last_price, avg_price].avg
+        # last_price
       else
-        avg_bid
+        avg_price
       end
     end
   end
