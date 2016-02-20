@@ -26,7 +26,7 @@ class Dealer
   end
 
   # def deal_buy_low_first(index:)
-  #   price = Quote.buy_in_price
+  #   price = Quote.good_price(based_on: :ask)
   #   return if price.zero?
   #
   #   @index = index
@@ -43,7 +43,7 @@ class Dealer
   # end
   #
   # def deal_sell_high_first(index:)
-  #   price = Quote.buy_in_price
+  #   price = Quote.good_price(based_on: :bid)
   #   return if price.zero?
   #
   #   @index = index
@@ -60,7 +60,7 @@ class Dealer
   # end
 
   def deal_buy_first(index:)
-    price = Quote.buy_in_price
+    price = Quote.good_price(based_on: :ask)
     return if price.zero?
 
     @index = index
@@ -81,7 +81,7 @@ class Dealer
   end
 
   def deal_sell_first(index:)
-    price = Quote.buy_in_price
+    price = Quote.good_price(based_on: :bid)
     return if price.zero?
 
     @index = index

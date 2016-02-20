@@ -15,14 +15,16 @@ class Quote
   field :quoteTime,   type: String
 
   class << self
-    def buy_in_price
+    # buy first use based_on: :ask
+    # sell first use based_on: :bid
+    def good_price(based_on:)
       return 0 if Quote.count < 3
 
       sample = Quote.order_by(lastTrade: :desc).limit(6)
-      last_price = sample.first.try(:ask)
+      last_price = sample.first.try(based_on)
 
-      prices    = sample.pluck(:ask).reject(&:zero?).sort
-      range   = prices.count / 3
+      prices    = sample.pluck(based_on).reject(&:zero?).sort
+      range     = prices.count / 3
       avg_price = prices[range, range].avg
 
       valid_rate = 0.05
