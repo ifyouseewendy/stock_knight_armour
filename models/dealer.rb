@@ -4,7 +4,7 @@ require 'stock_knight'
 class Dealer
   include Celluloid
 
-  SHARE = 120
+  SHARE = 140
 
   attr_reader :client, :stock, :profit, :share
 
@@ -64,6 +64,11 @@ class Dealer
     price = Quote.good_price(based_on: :ask)
     return if price.zero?
 
+    share_now = share.value
+    if share_now.abs > 700
+      puts "#{id} --> sell skip, current share: #{share_now}"
+    end
+
     @index = index
 
     bid_rate, bid_share = 1, (0.04/Manager::DEALER_COUNT)
@@ -84,6 +89,11 @@ class Dealer
   def deal_sell_first(index:)
     price = Quote.good_price(based_on: :bid)
     return if price.zero?
+
+    share_now = share.value
+    if share_now.abs > 700
+      puts "#{id} --> sell skip, current share: #{share_now}"
+    end
 
     @index = index
 
