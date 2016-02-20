@@ -1,5 +1,4 @@
 require 'celluloid/current'
-require_relative 'quote'
 
 class Processor
   include Celluloid

@@ -1,11 +1,8 @@
-require_relative 'fetcher'
-require_relative 'processor'
-require_relative 'quote'
-require_relative 'dealer'
-
 class Manager
   attr_reader :fetcher, :processor, :dealers, :start_time
   attr_accessor :counter, :profit
+
+  DEALER_COUNT = 16
 
   def initialize
     @fetcher    = Fetcher.pool(size: 2, args: self)   # size default to system cores count
@@ -14,8 +11,8 @@ class Manager
     @counter    = 0
     @start_time = Time.now.to_i
 
-    @dealers    = 16.times.map{ Dealer.new }
-    @profit     = 0
+    @profit     = Profit.new
+    @dealers    = DEALER_COUNT.times.map{ Dealer.new(@profit) }
   end
 
   def dispatch
@@ -41,16 +38,26 @@ class Manager
   end
 
   def deal
-    futures = []
+    price = Quote.buy_in_price
+    return if price.zero?
 
-    dealers.each do |dealer|
-      sleep(rand(2))
-      futures << dealer.async.deal
+    # bid: 0.95 ~ 1.05
+    bid_rate, bid_share, bids = 0.95, (1.0/DEALER_COUNT).round(2), []
+    DEALER_COUNT.times do
+      bids << bid_rate
+      bid_rate += bid_share
     end
 
-    self.profit += (futures.map(&:value).map(&:to_i).sum / 100.0).round(2)
+    # ask: 1.05 ~ 1.0
+    ask_rate, ask_share, asks = 1.05, (0.05/DEALER_COUNT).round(2), []
+    DEALER_COUNT.times do
+      asks << ask_rate
+      ask_rate += ask_share
+    end
 
-    puts "--> profit: #{profit}"
+    dealers.each_with_index do |dealer, idx|
+      dealer.async.deal(bid: bids[idx], ask: asks[idx])
+    end
   end
 
   def clean_db
