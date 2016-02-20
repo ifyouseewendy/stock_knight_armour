@@ -23,11 +23,13 @@ class Dealer
   def deal(bid:, ask:)
     return if bid == 0
 
-    amount = buy_ioc(price: bid, qty: 60)
+    amount, fill_price = buy_ioc(price: bid, qty: 60)
     return 0 if amount.zero?
 
-    base = bid*amount
-    sell_ioc(price: ask, qty: amount, base: base)
+    base = amount * fill_price
+    ask_price = [fill_price+200, fill_price * 0.9].max
+
+    sell_ioc(price: ask_price, qty: amount, base: base)
   end
 
   def id
@@ -87,8 +89,9 @@ class Dealer
       puts "#{id} --> amount 0"
       return 0
     else
+      fill_price = resp[:fills][0]['price']
       puts "#{id} --> bought #{amount} at #{price}"
-      return amount
+      return amount, fill_price
     end
   end
 
@@ -140,15 +143,16 @@ class Dealer
       amount = resp[:totalFilled].to_i
 
       if amount == 0
-        price -= 50
+        price -= 20
         next
       end
 
       puts "#{id} --> sold #{amount} at #{price}"
 
-      sum += amount*price
+      fill_price = resp[:fills][0]['price'].to_i
+      sum += amount*fill_price
       qty -= amount
-      price -= 50
+      price -= 20
 
       break if qty == 0
     end
