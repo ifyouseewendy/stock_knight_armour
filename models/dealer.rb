@@ -6,9 +6,9 @@ class Dealer
 
   SHARE = 120
 
-  attr_reader :client, :stock, :profit
+  attr_reader :client, :stock, :profit, :share
 
-  def initialize(profit)
+  def initialize(profit, share)
     @client = StockKnight::Client.new(ENV['APIKEY'])
 
     @client.configure do |config|
@@ -20,6 +20,7 @@ class Dealer
     @stock = ENV['STOCK']
 
     @profit = profit
+    @share  = share
     @self_profit = Profit.new
     @transaction_count = Profit.new
     @index  = 0
@@ -140,6 +141,7 @@ class Dealer
     else
       fill_price = (fill_sum/fill_qty.to_f).to_i
       puts "#{id} --> bought #{fill_qty} at #{fill_price}"
+      share.increment_by( fill_qty )
       return fill_qty, fill_price
     end
   end
@@ -164,6 +166,7 @@ class Dealer
   def buy_limit_block(price:, qty:, base:)
     type = :limit
 
+    init_qty = qty
     sum = 0
     down_price = [100]
     pos = 0
@@ -195,11 +198,12 @@ class Dealer
 
     value = base - sum
     profit.increment_by(value)
+    share.increment_by( init_qty )
     @self_profit.increment_by(value)
     @transaction_count.increment_by(1)
 
     value = "+#{value}" if value >= 0
-    puts "#{id} --> profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, transaction_count: #{@transaction_count.value})"
+    puts "#{id} --> share: #{share.value} profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, transaction_count: #{@transaction_count.value})"
   end
 
   def sell_limit(price:, qty:)
@@ -221,6 +225,7 @@ class Dealer
     else
       fill_price = (fill_sum/fill_qty.to_f).to_i
       puts "#{id} --> sold #{fill_qty} at #{fill_price}"
+      share.increment_by( 0 - fill_qty )
       return fill_qty, fill_price
     end
   end
@@ -228,6 +233,7 @@ class Dealer
   def sell_limit_block(price:, qty:, base:)
     type = :limit
 
+    init_qty = qty
     sum = 0
     down_price = [100]
     pos = 0
@@ -260,11 +266,12 @@ class Dealer
 
     value = sum - base
     profit.increment_by(value)
+    share.increment_by( 0 - init_qty )
     @self_profit.increment_by(value)
     @transaction_count.increment_by(1)
 
     value = "+#{value}" if value >= 0
-    puts "#{id} --> profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, transaction_count: #{@transaction_count.value})"
+    puts "#{id} --> share: #{share.value} profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, transaction_count: #{@transaction_count.value})"
   end
 
   def sell_ioc(price:, qty:, base:)

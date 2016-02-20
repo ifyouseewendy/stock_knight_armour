@@ -1,6 +1,6 @@
 class Manager
   attr_reader :fetcher, :processor, :dealers, :start_time
-  attr_accessor :counter, :profit
+  attr_accessor :counter, :profit, :share
 
   DEALER_COUNT = 16
 
@@ -12,7 +12,8 @@ class Manager
     @start_time = Time.now.to_i
 
     @profit     = Profit.new
-    @dealers    = DEALER_COUNT.times.map{ Dealer.new(@profit) }
+    @share      = Profit.new
+    @dealers    = DEALER_COUNT.times.map{ Dealer.new(@profit, @share) }
   end
 
   def dispatch
