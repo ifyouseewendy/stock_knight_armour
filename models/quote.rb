@@ -27,8 +27,9 @@ class Quote
 
       valid_rate = 0.05
       if last_price >= avg_price*(1-valid_rate) && last_price <= avg_price*(1+valid_rate)
-        [last_price, avg_price].avg
+        # [last_price, avg_price].avg
         # last_price
+        avg_price
       else
         avg_price
       end

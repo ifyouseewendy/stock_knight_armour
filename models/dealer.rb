@@ -18,6 +18,8 @@ class Dealer
     @stock = ENV['STOCK']
 
     @profit = profit
+    @self_profit = Profit.new
+    @transaction_count = Profit.new
     @index  = 0
   end
 
@@ -28,16 +30,16 @@ class Dealer
     @index = index
 
     bid_rate, bid_share = 1, (0.04/Manager::DEALER_COUNT)
-    bid_rate += index * bid_share
+    bid_rate -= index * bid_share
     bid = ( price * 100 * bid_rate ).to_i
 
     return if bid == 0
 
-    amount, fill_price = buy_ioc(price: bid, qty: 120)
+    amount, fill_price = buy_limit(price: bid, qty: 120)
     return 0 if amount.zero?
 
     base = amount * fill_price
-    ask_price = [fill_price+200, fill_price * 0.9].max
+    ask_price = [fill_price+200, (bid*0.95).to_i].max
 
     sell_limit(price: ask_price, qty: amount, base: base)
   end
@@ -67,25 +69,22 @@ class Dealer
 
     puts "#{id} --> buy #{qty} at #{price}"
     order = client.buy(stock, price: price, qty: qty, type: type)[:id]
+    resp = client.cancel(stock, order: order)
 
-    # puts "#{id} --> sleep"
-    # sleep( rand(1) )
-    resp = client.query(stock, order: order)
-    amount = resp[:totalFilled].to_i
+    fills = resp[:fills]
+    return 0 if fills.nil?
 
-    if amount == 0
-      resp = client.cancel(stock, order: order)
-      amount = resp[:totalFilled].to_i
+    fill_qty  = fills.map{|ha| ha['qty'].to_i}.sum
+    fill_sum = fills.map{|ha| ha['price'].to_i * ha['qty'].to_i}.sum
 
-      if amount.zero?
-        puts "#{id} --> amount 0"
-        return 0
-      end
+    if fill_qty.zero?
+      puts "#{id} --> amount 0"
+      return 0
+    else
+      fill_price = (fill_sum/fill_qty.to_f).to_i
+      puts "#{id} --> bought #{fill_qty} at #{fill_price}"
+      return fill_qty, fill_price
     end
-
-    puts "#{id} --> bought #{amount} at #{price}"
-
-    return amount
   end
 
   def buy_ioc(price:, qty:)
@@ -109,6 +108,8 @@ class Dealer
     type = :limit
 
     sum = 0
+    down_price = [100]
+    pos = 0
     loop do
       puts "#{id} --> sell #{qty} at #{price}"
 
@@ -117,6 +118,8 @@ class Dealer
       resp = client.cancel(stock, order: order)
 
       fills = resp[:fills]
+      next if fills.nil?
+
       fill_qty  = fills.map{|ha| ha['qty'].to_i}.sum
       fill_sum = fills.map{|ha| ha['price'].to_i * ha['qty'].to_i}.sum
 
@@ -128,15 +131,18 @@ class Dealer
       else
         puts "#{id} --> sold #{fill_qty}"
         qty -= fill_qty
-        price -= 40
+        price -= (down_price[pos] || 100)
+        pos += 1
       end
     end
 
     value = sum - base
     profit.increment_by(value)
+    @self_profit.increment_by(value)
+    @transaction_count.increment_by(1)
 
     value = "+#{value}" if value >= 0
-    puts "#{id} --> profit: #{profit.value} (#{value})"
+    puts "#{id} --> profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, transaction_count: #{@transaction_count.value})"
   end
 
   def sell_ioc(price:, qty:, base:)
