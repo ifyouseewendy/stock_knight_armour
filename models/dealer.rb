@@ -4,9 +4,9 @@ require 'stock_knight'
 class Dealer
   include Celluloid
 
-  attr_reader :client, :stock
+  attr_reader :client, :stock, :profit
 
-  def initialize
+  def initialize(profit)
     @client = StockKnight::Client.new(ENV['APIKEY'])
 
     @client.configure do |config|
@@ -16,32 +16,18 @@ class Dealer
     end
 
     @stock = ENV['STOCK']
+
+    @profit = profit
   end
 
-  def buy_low
-    price = buy_in_price
-    return if price == 0
+  def deal(bid:, ask:)
+    return if bid == 0
 
-    price += 10
-    amount = buy(price: price, qty: 60, type: :limit)
-    if amount > 0
-      sell(price: price+300, qty: amount, type: :limit, base: price*amount)
-    else
-      0
-    end
-  end
+    amount = buy_ioc(price: bid, qty: 60)
+    return 0 if amount.zero?
 
-  def deal
-    return if last_quote.nil?
-    return if last_bid == 0
-
-    price = last_bid + 10
-    amount = buy(price: price, qty: 200, type: :limit)
-    if amount > 0
-      sell(price: price+200, qty: amount, type: :limit, base: price*amount)
-    else
-      0
-    end
+    base = bid*amount
+    sell_ioc(price: ask, qty: amount, base: base)
   end
 
   def id
@@ -64,15 +50,9 @@ class Dealer
     (last_quote.ask * 100).to_i
   end
 
-  def buy_in_price
-    prices = collection.limit(3).pluck(:bid).reject(&:zero?)
-    sum = prices.sum
-    return 0 if sum.zero?
+  def buy_limit(price:, qty:)
+    type = :limit
 
-    (sum * 100.0 / prices.count).to_i
-  end
-
-  def buy(price:, qty:, type:)
     puts "#{id} --> buy #{qty} at #{price}"
     order = client.buy(stock, price: price, qty: qty, type: type)[:id]
 
@@ -91,17 +71,34 @@ class Dealer
       end
     end
 
-    # orders << Order.new(:buy, amount, price)
     puts "#{id} --> bought #{amount} at #{price}"
 
     return amount
   end
 
-  def sell(price:, qty:, type:, base:)
-    puts "#{id} --> sell #{qty} at #{price}"
+  def buy_ioc(price:, qty:)
+    type = :immediate_or_cancel
+
+    puts "#{id} --> buy #{qty} at #{price}"
+    resp = client.buy(stock, price: price, qty: qty, type: type)
+    amount = resp[:totalFilled]
+
+    if amount == 0
+      puts "#{id} --> amount 0"
+      return 0
+    else
+      puts "#{id} --> bought #{amount} at #{price}"
+      return amount
+    end
+  end
+
+  def sell_limit(price:, qty:, base:)
+    type = :limit
 
     sum = 0
     loop do
+      puts "#{id} --> sell #{qty} at #{price}"
+
       order = client.sell(stock, price: price, qty: qty, type: type)[:id]
 
       # sleep( rand(1) )
@@ -132,19 +129,35 @@ class Dealer
     sum - base
   end
 
-  def orders
-    Thread.current[:orders] ||= []
-    Thread.current[:orders]
-  end
+  def sell_ioc(price:, qty:, base:)
+    type = :immediate_or_cancel
 
-  Order = Struct.new(:op, :amount, :price) do
-    def profit
-      if op == :buy
-        0 - (amount * price)
-      else
-        amount * price
+    sum = 0
+    loop do
+      puts "#{id} --> sell #{qty} at #{price}"
+
+      resp = client.sell(stock, price: price, qty: qty, type: type)
+      amount = resp[:totalFilled].to_i
+
+      if amount == 0
+        price -= 50
+        next
       end
+
+      puts "#{id} --> sold #{amount} at #{price}"
+
+      sum += amount*price
+      qty -= amount
+      price -= 50
+
+      break if qty == 0
     end
+
+    value = sum - base
+    profit.increment_by(value)
+
+    value = "+#{value}" if value >= 0
+    puts "#{id} --> profit: #{profit.value} (#{value})"
   end
 
 end
