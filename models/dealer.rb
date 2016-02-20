@@ -4,7 +4,7 @@ require 'stock_knight'
 class Dealer
   include Celluloid
 
-  SHARE = 140
+  SHARE = 250
 
   attr_reader :client, :stock, :profit, :share
 
@@ -26,48 +26,59 @@ class Dealer
     @index  = 0
   end
 
-  # def deal_buy_low_first(index:)
-  #   price = Quote.good_price(based_on: :ask)
-  #   return if price.zero?
-  #
-  #   @index = index
-  #
-  #   bid = ( price * 100 * 0.7 ).to_i
-  #
-  #   amount, fill_price = buy_limit(price: bid, qty: SHARE)
-  #   return 0 if amount.zero?
-  #
-  #   base = amount * fill_price
-  #   ask_price = ( price * 100 * 0.95 ).to_i
-  #
-  #   sell_limit(price: ask_price, qty: amount, base: base)
-  # end
-  #
-  # def deal_sell_high_first(index:)
-  #   price = Quote.good_price(based_on: :bid)
-  #   return if price.zero?
-  #
-  #   @index = index
-  #
-  #   ask = ( price * 100 * 1.3 ).to_i
-  #
-  #   amount, fill_price = sell_limit(price: ask, qty: SHARE)
-  #   return 0 if amount.zero?
-  #
-  #   base = amount * fill_price
-  #   bid_price = ( price * 100 * 1.05 ).to_i
-  #
-  #   buy_limit(price: bid_price, qty: amount, base: base)
-  # end
-
-  def deal_buy_first(index:)
-    price = Quote.good_price(based_on: :ask)
-    return if price.zero?
-
+  def valid_share_value
     share_now = share.value
     if share_now.abs > 700
       puts "#{id} --> sell skip, current share: #{share_now}"
+      false
+    else
+      true
     end
+  end
+
+  def deal_buy_low_first(index:)
+    return unless valid_share_value
+
+    price = Quote.good_price(based_on: :ask)
+    return if price.zero?
+
+    @index = index
+
+    bid = ( price * 100 * 0.7 ).to_i
+
+    amount, fill_price = buy_limit(price: bid, qty: SHARE)
+    return 0 if amount.zero?
+
+    base = amount * fill_price
+    ask_price = ( price * 100 * 0.95 ).to_i
+
+    sell_limit_block(price: ask_price, qty: amount, base: base)
+  end
+
+  def deal_sell_high_first(index:)
+    return unless valid_share_value
+
+    price = Quote.good_price(based_on: :bid)
+    return if price.zero?
+
+    @index = index
+
+    ask = ( price * 100 * 1.3 ).to_i
+
+    amount, fill_price = sell_limit(price: ask, qty: SHARE)
+    return 0 if amount.zero?
+
+    base = amount * fill_price
+    bid_price = ( price * 100 * 1.05 ).to_i
+
+    buy_limit_block(price: bid_price, qty: amount, base: base)
+  end
+
+  def deal_buy_first(index:)
+    return unless valid_share_value
+
+    price = Quote.good_price(based_on: :ask)
+    return if price.zero?
 
     @index = index
 
@@ -87,13 +98,10 @@ class Dealer
   end
 
   def deal_sell_first(index:)
+    return unless valid_share_value
+
     price = Quote.good_price(based_on: :bid)
     return if price.zero?
-
-    share_now = share.value
-    if share_now.abs > 700
-      puts "#{id} --> sell skip, current share: #{share_now}"
-    end
 
     @index = index
 
