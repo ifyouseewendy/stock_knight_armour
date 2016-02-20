@@ -42,21 +42,22 @@ class Manager
     return if price.zero?
 
     # bid: 0.95 ~ 1.05
-    bid_rate, bid_share, bids = 0.95, (1.0/DEALER_COUNT).round(2), []
+    bid_rate, bid_share, bids = 1, (0.04/DEALER_COUNT), []
     DEALER_COUNT.times do
-      bids << bid_rate
+      bids << ( price * 100 * bid_rate ).to_i
       bid_rate += bid_share
     end
 
     # ask: 1.05 ~ 1.0
-    ask_rate, ask_share, asks = 1.05, (0.05/DEALER_COUNT).round(2), []
-    DEALER_COUNT.times do
-      asks << ask_rate
-      ask_rate += ask_share
-    end
+    # ask_rate, ask_share, asks = 1.04, (0/DEALER_COUNT), []
+    # bids.each do |bid|
+    #   asks << ( bid * ask_rate).to_i
+    #   ask_rate += ask_share
+    # end
 
     dealers.each_with_index do |dealer, idx|
-      dealer.async.deal(bid: bids[idx], ask: asks[idx])
+      sleep(1)
+      dealer.async.deal(bid: bids[idx], ask: 0)
     end
   end
 
