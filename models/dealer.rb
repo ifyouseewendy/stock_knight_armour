@@ -18,12 +18,22 @@ class Dealer
     @stock = ENV['STOCK']
 
     @profit = profit
+    @index  = 0
   end
 
-  def deal(bid:, ask:)
+  def deal(index:)
+    price = Quote.buy_in_price
+    return if price.zero?
+
+    @index = index
+
+    bid_rate, bid_share = 1, (0.04/Manager::DEALER_COUNT)
+    bid_rate += index * bid_share
+    bid = ( price * 100 * bid_rate ).to_i
+
     return if bid == 0
 
-    amount, fill_price = buy_ioc(price: bid, qty: 60)
+    amount, fill_price = buy_ioc(price: bid, qty: 120)
     return 0 if amount.zero?
 
     base = amount * fill_price
@@ -33,7 +43,7 @@ class Dealer
   end
 
   def id
-    self.object_id
+    "##{@index}"
   end
 
   def collection
@@ -143,7 +153,7 @@ class Dealer
       amount = resp[:totalFilled].to_i
 
       if amount == 0
-        price -= 20
+        price -= 40
         next
       end
 
@@ -152,7 +162,7 @@ class Dealer
       fill_price = resp[:fills][0]['price'].to_i
       sum += amount*fill_price
       qty -= amount
-      price -= 20
+      price -= 40
 
       break if qty == 0
     end

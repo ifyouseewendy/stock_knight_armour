@@ -2,7 +2,7 @@ class Manager
   attr_reader :fetcher, :processor, :dealers, :start_time
   attr_accessor :counter, :profit
 
-  DEALER_COUNT = 16
+  DEALER_COUNT = 8
 
   def initialize
     @fetcher    = Fetcher.pool(size: 2, args: self)   # size default to system cores count
@@ -38,26 +38,8 @@ class Manager
   end
 
   def deal
-    price = Quote.buy_in_price
-    return if price.zero?
-
-    # bid: 0.95 ~ 1.05
-    bid_rate, bid_share, bids = 1, (0.04/DEALER_COUNT), []
-    DEALER_COUNT.times do
-      bids << ( price * 100 * bid_rate ).to_i
-      bid_rate += bid_share
-    end
-
-    # ask: 1.05 ~ 1.0
-    # ask_rate, ask_share, asks = 1.04, (0/DEALER_COUNT), []
-    # bids.each do |bid|
-    #   asks << ( bid * ask_rate).to_i
-    #   ask_rate += ask_share
-    # end
-
     dealers.each_with_index do |dealer, idx|
-      sleep(1)
-      dealer.async.deal(bid: bids[idx], ask: 0)
+      dealer.async.deal(index: idx)
     end
   end
 

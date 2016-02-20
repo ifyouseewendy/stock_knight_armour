@@ -16,7 +16,7 @@ class Quote
 
   class << self
     def buy_in_price
-      return 0 if Quote.count < 6
+      return 0 if Quote.count < 3
 
       sample = Quote.order_by(lastTrade: :desc).limit(6)
       last_price = sample.first.try(:ask)
