@@ -2,7 +2,7 @@ class Manager
   attr_reader :fetcher, :processor, :dealers, :start_time
   attr_accessor :counter, :profit
 
-  DEALER_COUNT = 8
+  DEALER_COUNT = 16
 
   def initialize
     @fetcher    = Fetcher.pool(size: 2, args: self)   # size default to system cores count
@@ -39,7 +39,11 @@ class Manager
 
   def deal
     dealers.each_with_index do |dealer, idx|
-      dealer.async.deal_sell_first(index: idx)
+      if idx.even?
+        dealer.async.deal_buy_first(index: idx)
+      else
+        dealer.async.deal_sell_first(index: idx)
+      end
     end
   end
 
