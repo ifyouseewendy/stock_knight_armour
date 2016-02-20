@@ -39,7 +39,7 @@ class Manager
 
   def deal
     dealers.each_with_index do |dealer, idx|
-      dealer.async.deal(index: idx)
+      dealer.async.deal_sell_first(index: idx)
     end
   end
 

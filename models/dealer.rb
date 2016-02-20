@@ -59,7 +59,7 @@ class Dealer
   #   buy_limit(price: bid_price, qty: amount, base: base)
   # end
 
-  def deal(index:)
+  def deal_buy_first(index:)
     price = Quote.buy_in_price
     return if price.zero?
 
@@ -78,6 +78,27 @@ class Dealer
     ask_price = [fill_price+200, (bid*0.95).to_i].max
 
     sell_limit_block(price: ask_price, qty: amount, base: base)
+  end
+
+  def deal_sell_first(index:)
+    price = Quote.buy_in_price
+    return if price.zero?
+
+    @index = index
+
+    ask_rate, ask_share = 1, (0.04/Manager::DEALER_COUNT)
+    ask_rate += index * ask_share
+    ask = ( price * 100 * ask_rate ).to_i
+
+    return if ask == 0
+
+    amount, fill_price = sell_limit(price: ask, qty: SHARE)
+    return 0 if amount.zero?
+
+    base = amount * fill_price
+    bid_price = [fill_price-200, (ask*1.05).to_i].min
+
+    buy_limit_block(price: bid_price, qty: amount, base: base)
   end
 
   def id
@@ -157,11 +178,12 @@ class Dealer
 
       fill_qty  = fills.map{|ha| ha['qty'].to_i}.sum
       fill_sum = fills.map{|ha| ha['price'].to_i * ha['qty'].to_i}.sum
+      fill_price = (fill_sum/fill_qty.to_f).to_i rescue 0
 
       sum += fill_sum
 
       if qty == fill_qty
-        puts "#{id} --> bought #{fill_qty} at #{price}"
+        puts "#{id} --> bought #{fill_qty} at #{fill_price}"
         break
       else
         puts "#{id} --> bought #{fill_qty}"
@@ -221,11 +243,12 @@ class Dealer
 
       fill_qty  = fills.map{|ha| ha['qty'].to_i}.sum
       fill_sum = fills.map{|ha| ha['price'].to_i * ha['qty'].to_i}.sum
+      fill_price = (fill_sum/fill_qty.to_f).to_i rescue 0
 
       sum += fill_sum
 
       if qty == fill_qty
-        puts "#{id} --> sold #{fill_qty} at #{price}"
+        puts "#{id} --> sold #{fill_qty} at #{fill_price}"
         break
       else
         puts "#{id} --> sold #{fill_qty}"
