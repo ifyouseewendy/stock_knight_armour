@@ -7,8 +7,6 @@ require File.expand_path('../../models/models', __FILE__)
 
 manager = Manager.new
 
-50.times do
+loop do
   manager.deal
 end
-
-sleep
