@@ -10,3 +10,5 @@ manager = Manager.new
 50.times do
   manager.deal
 end
+
+sleep

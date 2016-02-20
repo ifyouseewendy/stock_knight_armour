@@ -39,7 +39,7 @@ class Dealer
     base = amount * fill_price
     ask_price = [fill_price+200, fill_price * 0.9].max
 
-    sell_ioc(price: ask_price, qty: amount, base: base)
+    sell_limit(price: ask_price, qty: amount, base: base)
   end
 
   def id
@@ -113,33 +113,30 @@ class Dealer
       puts "#{id} --> sell #{qty} at #{price}"
 
       order = client.sell(stock, price: price, qty: qty, type: type)[:id]
+      # sleep(2)
+      resp = client.cancel(stock, order: order)
 
-      # sleep( rand(1) )
-      resp = client.query(stock, order: order)
-      amount = resp[:totalFilled].to_i
+      fills = resp[:fills]
+      fill_qty  = fills.map{|ha| ha['qty'].to_i}.sum
+      fill_sum = fills.map{|ha| ha['price'].to_i * ha['qty'].to_i}.sum
 
-      if amount == 0
-        resp = client.cancel(stock, order: order)
-        amount = resp[:totalFilled].to_i
+      sum += fill_sum
 
-        if amount.zero?
-          price -= 20
-          next
-        end
+      if qty == fill_qty
+        puts "#{id} --> sold #{fill_qty} at #{price}"
+        break
+      else
+        puts "#{id} --> sold #{fill_qty}"
+        qty -= fill_qty
+        price -= 40
       end
-
-      # orders << Order.new(:sell, amount, price)
-      puts "#{id} --> sold #{amount} at #{price}"
-
-      sum += amount*price
-
-      qty -= amount
-      price -= 20
-      break if qty == 0
     end
 
-    puts "#{id} --> profit: #{sum-base}"
-    sum - base
+    value = sum - base
+    profit.increment_by(value)
+
+    value = "+#{value}" if value >= 0
+    puts "#{id} --> profit: #{profit.value} (#{value})"
   end
 
   def sell_ioc(price:, qty:, base:)
