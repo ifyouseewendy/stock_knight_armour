@@ -46,13 +46,13 @@ class Dealer
 
     bid = ( price * 100 * 0.7 ).to_i
 
-    amount, fill_price = buy_limit(price: bid, qty: SHARE)
+    amount, fill_price = buy(type: :limit, price: bid, qty: SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
     ask_price = ( price * 100 * 0.95 ).to_i
 
-    sell_limit_block(price: ask_price, qty: amount, base: base)
+    sell_block(type: :limit, price: ask_price, qty: amount, base: base)
   end
 
   def deal_sell_high_first(index:)
@@ -65,13 +65,13 @@ class Dealer
 
     ask = ( price * 100 * 1.3 ).to_i
 
-    amount, fill_price = sell_limit(price: ask, qty: SHARE)
+    amount, fill_price = sell(type: :limit, price: ask, qty: SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
     bid_price = ( price * 100 * 1.05 ).to_i
 
-    buy_limit_block(price: bid_price, qty: amount, base: base)
+    buy_block(type: :limit, price: bid_price, qty: amount, base: base)
   end
 
   def deal_buy_first(index:)
@@ -88,13 +88,13 @@ class Dealer
 
     return if bid == 0
 
-    amount, fill_price = buy_limit(price: bid, qty: SHARE)
+    amount, fill_price = buy(type: :limit, price: bid, qty: SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
     ask_price = [fill_price+200, (bid*0.95).to_i].max
 
-    sell_limit_block(price: ask_price, qty: amount, base: base)
+    sell_block(type: :limit, price: ask_price, qty: amount, base: base)
   end
 
   def deal_sell_first(index:)
@@ -111,13 +111,13 @@ class Dealer
 
     return if ask == 0
 
-    amount, fill_price = sell_limit(price: ask, qty: SHARE)
+    amount, fill_price = sell(type: :limit, price: ask, qty: SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
     bid_price = [fill_price-200, (ask*1.05).to_i].min
 
-    buy_limit_block(price: bid_price, qty: amount, base: base)
+    buy_block(type: :limit, price: bid_price, qty: amount, base: base)
   end
 
   def id
@@ -140,12 +140,17 @@ class Dealer
     (last_quote.ask * 100).to_i
   end
 
-  def buy_limit(price:, qty:)
-    type = :limit
-
+  def buy(type:, price:, qty:)
     puts "#{id} --> buy #{qty} at #{price}"
-    order = client.buy(stock, price: price, qty: qty, type: type)[:id]
-    resp = client.cancel(stock, order: order)
+
+    if type == :limit
+      order = client.buy(stock, price: price, qty: qty, type: type)[:id]
+      resp = client.cancel(stock, order: order)
+    elsif type == :immediate_or_cancel
+      resp = client.buy(stock, price: price, qty: qty, type: type)
+    else
+      raise "Wrong type: #{type}"
+    end
 
     fills = resp[:fills]
     return 0 if fills.nil?
@@ -164,26 +169,7 @@ class Dealer
     end
   end
 
-  def buy_ioc(price:, qty:)
-    type = :immediate_or_cancel
-
-    puts "#{id} --> buy #{qty} at #{price}"
-    resp = client.buy(stock, price: price, qty: qty, type: type)
-    amount = resp[:totalFilled]
-
-    if amount == 0
-      puts "#{id} --> amount 0"
-      return 0
-    else
-      fill_price = resp[:fills][0]['price']
-      puts "#{id} --> bought #{amount} at #{price}"
-      return amount, fill_price
-    end
-  end
-
-  def buy_limit_block(price:, qty:, base:)
-    type = :limit
-
+  def buy_block(type:, price:, qty:, base:)
     init_qty = qty
     sum = 0
     down_price = [100]
@@ -191,8 +177,14 @@ class Dealer
     loop do
       puts "#{id} --> buy #{qty} at #{price}"
 
-      order = client.buy(stock, price: price, qty: qty, type: type)[:id]
-      resp = client.cancel(stock, order: order)
+      if type == :limit
+        order = client.buy(stock, price: price, qty: qty, type: type)[:id]
+        resp = client.cancel(stock, order: order)
+      elsif type == :immediate_or_cancel
+        resp = client.buy(stock, price: price, qty: qty, type: type)
+      else
+        raise "Wrong type: #{type}"
+      end
 
       fills = resp[:fills]
       next if fills.nil?
@@ -224,12 +216,17 @@ class Dealer
     puts "#{id} --> share: #{share.value} profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, transaction_count: #{@transaction_count.value})"
   end
 
-  def sell_limit(price:, qty:)
-    type = :limit
-
+  def sell(type:, price:, qty:)
     puts "#{id} --> sell #{qty} at #{price}"
-    order = client.sell(stock, price: price, qty: qty, type: type)[:id]
-    resp = client.cancel(stock, order: order)
+
+    if type == :limit
+      order = client.sell(stock, price: price, qty: qty, type: type)[:id]
+      resp = client.cancel(stock, order: order)
+    elsif type == :immediate_or_cancel
+      resp = client.sell(stock, price: price, qty: qty, type: type)
+    else
+      raise "Wrong type: #{type}"
+    end
 
     fills = resp[:fills]
     return 0 if fills.nil?
@@ -248,9 +245,7 @@ class Dealer
     end
   end
 
-  def sell_limit_block(price:, qty:, base:)
-    type = :limit
-
+  def sell_block(type:, price:, qty:, base:)
     init_qty = qty
     sum = 0
     down_price = [100]
@@ -258,9 +253,14 @@ class Dealer
     loop do
       puts "#{id} --> sell #{qty} at #{price}"
 
-      order = client.sell(stock, price: price, qty: qty, type: type)[:id]
-      # sleep(2)
-      resp = client.cancel(stock, order: order)
+      if type == :limit
+        order = client.sell(stock, price: price, qty: qty, type: type)[:id]
+        resp = client.cancel(stock, order: order)
+      elsif type == :immediate_or_cancel
+        resp = client.sell(stock, price: price, qty: qty, type: type)
+      else
+        raise "Wrong type: #{type}"
+      end
 
       fills = resp[:fills]
       next if fills.nil?
@@ -290,38 +290,6 @@ class Dealer
 
     value = "+#{value}" if value >= 0
     puts "#{id} --> share: #{share.value} profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, transaction_count: #{@transaction_count.value})"
-  end
-
-  def sell_ioc(price:, qty:, base:)
-    type = :immediate_or_cancel
-
-    sum = 0
-    loop do
-      puts "#{id} --> sell #{qty} at #{price}"
-
-      resp = client.sell(stock, price: price, qty: qty, type: type)
-      amount = resp[:totalFilled].to_i
-
-      if amount == 0
-        price -= 40
-        next
-      end
-
-      puts "#{id} --> sold #{amount} at #{price}"
-
-      fill_price = resp[:fills][0]['price'].to_i
-      sum += amount*fill_price
-      qty -= amount
-      price -= 40
-
-      break if qty == 0
-    end
-
-    value = sum - base
-    profit.increment_by(value)
-
-    value = "+#{value}" if value >= 0
-    puts "#{id} --> profit: #{profit.value} (#{value})"
   end
 
 end

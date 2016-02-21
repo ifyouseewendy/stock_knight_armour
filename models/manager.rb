@@ -42,8 +42,10 @@ class Manager
     dealers.each_with_index do |dealer, idx|
       if idx.even?
         dealer.async.deal_buy_low_first(index: idx)
+        # dealer.async.deal_buy_first(index: idx)
       else
         dealer.async.deal_sell_high_first(index: idx)
+        # dealer.async.deal_sell_first(index: idx)
       end
     end
   end
