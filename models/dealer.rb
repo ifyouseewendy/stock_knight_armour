@@ -4,9 +4,19 @@ require 'stock_knight'
 class Dealer
   include Celluloid
 
-  attr_reader :client, :stock, :profit, :share
+  attr_reader :client, :stock, :profit, :share, :index
 
-  def initialize(profit, share)
+  def initialize(index, profit, share)
+    initialize_client
+
+    @index  = index
+    @profit = profit
+    @share  = share
+    @self_profit = DbCounter.new("self_profit_#{index}")
+    @transaction_count = DbCounter.new("transaction_count_#{index}")
+  end
+
+  def initialize_client
     @client = StockKnight::Client.new(ENV['APIKEY'])
 
     @client.configure do |config|
@@ -16,12 +26,6 @@ class Dealer
     end
 
     @stock = ENV['STOCK']
-
-    @profit = profit
-    @share  = share
-    @self_profit = DbCounter.new(:self_profit)
-    @transaction_count = DbCounter.new(:transaction_count)
-    @index  = 0
   end
 
   def valid_share_value
@@ -34,13 +38,11 @@ class Dealer
     end
   end
 
-  def deal_buy_low_first(index:)
+  def deal_buy_low_first
     return unless valid_share_value
 
     price = Quote.good_price(based_on: :ask)
     return if price.zero?
-
-    @index = index
 
     bid = ( price * 100 * 0.7 ).to_i
 
@@ -53,13 +55,11 @@ class Dealer
     sell_block(type: :limit, price: ask_price, qty: amount, base: base)
   end
 
-  def deal_sell_high_first(index:)
+  def deal_sell_high_first
     return unless valid_share_value
 
     price = Quote.good_price(based_on: :bid)
     return if price.zero?
-
-    @index = index
 
     ask = ( price * 100 * 1.3 ).to_i
 
@@ -72,13 +72,11 @@ class Dealer
     buy_block(type: :limit, price: bid_price, qty: amount, base: base)
   end
 
-  def deal_buy_first(index:)
+  def deal_buy_first
     return unless valid_share_value
 
     price = Quote.good_price(based_on: :ask)
     return if price.zero?
-
-    @index = index
 
     bid_rate, bid_share = 1, (0.04/Manager::DEALER)
     bid_rate -= index * bid_share
@@ -95,13 +93,11 @@ class Dealer
     sell_block(type: :limit, price: ask_price, qty: amount, base: base)
   end
 
-  def deal_sell_first(index:)
+  def deal_sell_first
     return unless valid_share_value
 
     price = Quote.good_price(based_on: :bid)
     return if price.zero?
-
-    @index = index
 
     ask_rate, ask_share = 1, (0.04/Manager::DEALER)
     ask_rate += index * ask_share
@@ -119,7 +115,7 @@ class Dealer
   end
 
   def id
-    "##{@index}"
+    "##{index}"
   end
 
   def collection

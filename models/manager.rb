@@ -14,7 +14,7 @@ class Manager
 
     @profit     = DbCounter.new(:profit)
     @share      = DbCounter.new(:share)
-    @dealers    = DEALER.times.map{ Dealer.new(@profit, @share) }
+    @dealers    = DEALER.times.with_index.map{|i, _| Dealer.new(i, @profit, @share) }
   end
 
   def dispatch
@@ -42,11 +42,11 @@ class Manager
   def deal
     dealers.each_with_index do |dealer, idx|
       if idx.even?
-        dealer.async.deal_buy_low_first(index: idx)
-        # dealer.async.deal_buy_first(index: idx)
+        dealer.async.deal_buy_low_first
+        # dealer.async.deal_buy_first
       else
-        dealer.async.deal_sell_high_first(index: idx)
-        # dealer.async.deal_sell_first(index: idx)
+        dealer.async.deal_sell_high_first
+        # dealer.async.deal_sell_first
       end
     end
   end
