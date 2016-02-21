@@ -1,5 +1,5 @@
 PATH
-  remote: /Users/wendi/Workspace/stock_knight
+  remote: vendor/cache/stock_knight
   specs:
     stock_knight (0.2.0)
       activesupport (~> 4.2)
@@ -46,6 +46,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (0.7.0)
     json (1.8.3)
+    kgio (2.10.0)
     method_source (0.8.2)
     minitest (5.8.4)
     mongo (2.2.2)
@@ -67,6 +68,7 @@ GEM
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
+    raindrops (0.15.0)
     sinatra (1.4.7)
       rack (~> 1.5)
       rack-protection (~> 1.4)
@@ -78,6 +80,10 @@ GEM
       hitimes
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    unicorn (5.0.1)
+      kgio (~> 2.6)
+      rack
+      raindrops (~> 0.7)
 
 PLATFORMS
   ruby
@@ -90,6 +96,7 @@ DEPENDENCIES
   pry-byebug
   sinatra
   stock_knight!
+  unicorn
 
 BUNDLED WITH
    1.11.2
