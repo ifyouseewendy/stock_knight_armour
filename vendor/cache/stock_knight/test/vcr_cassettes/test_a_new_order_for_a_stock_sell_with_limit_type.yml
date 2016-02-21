@@ -1,0 +1,50 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.stockfighter.io/ob/api/venues/TESTEX/stocks/FOOBAR/orders
+    body:
+      encoding: UTF-8
+      string: '{"account":"EXB123456","venue":"TESTEX","stock":"FOOBAR","direction":"sell","price":1000000,"qty":1000000,"orderType":"limit"}'
+    headers:
+      X-Stockfighter-Authorization:
+      - 133154ad29c9c864705a2ee581f4e945ef07541d
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.8.0
+      Date:
+      - Fri, 25 Dec 2015 17:04:19 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '303'
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "ok": true,
+          "symbol": "FOOBAR",
+          "venue": "TESTEX",
+          "direction": "sell",
+          "originalQty": 1000000,
+          "qty": 1000000,
+          "price": 1000000,
+          "orderType": "limit",
+          "id": 2226,
+          "account": "EXB123456",
+          "ts": "2015-12-25T17:04:18.128507539Z",
+          "fills": [],
+          "totalFilled": 0,
+          "open": true
+        }
+    http_version: 
+  recorded_at: Fri, 25 Dec 2015 17:04:03 GMT
+recorded_with: VCR 3.0.1

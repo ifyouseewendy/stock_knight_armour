@@ -1,0 +1,25 @@
+=== 1.1.2 / 2015-07-25
+
+* 1 bug fix:
+
+  * Fixed focus handling when run under Rake's rake_test_loader.rb.
+
+=== 1.1.1 / 2015-03-12
+
+* 1 minor enhancement:
+
+  * Escape method names in filter regexp. (ddiachkov)
+
+=== 1.1.0 / 2013-11-07
+
+* 1 major enhancement:
+
+  * Minitest 5 compatibility.
+    * Still works on minitest 4.
+
+=== 1.0.0 / 2013-01-07
+
+* 1 major enhancement
+
+  * Birthday!
+

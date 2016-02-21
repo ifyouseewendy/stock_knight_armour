@@ -1,0 +1,34 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.stockfighter.io/ob/api/heartbeat
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Stockfighter-Authorization:
+      - 133154ad29c9c864705a2ee581f4e945ef07541d
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.8.0
+      Date:
+      - Fri, 25 Dec 2015 16:55:37 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '22'
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains
+    body:
+      encoding: UTF-8
+      string: '{"ok":true,"error":""}'
+    http_version: 
+  recorded_at: Fri, 25 Dec 2015 16:55:22 GMT
+recorded_with: VCR 3.0.1

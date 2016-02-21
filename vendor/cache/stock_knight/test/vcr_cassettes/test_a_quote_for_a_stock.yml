@@ -1,0 +1,49 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.stockfighter.io/ob/api/venues/TESTEX/stocks/FOOBAR/quote
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Stockfighter-Authorization:
+      - 133154ad29c9c864705a2ee581f4e945ef07541d
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.8.0
+      Date:
+      - Fri, 25 Dec 2015 17:07:49 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '299'
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "ok": true,
+          "symbol": "FOOBAR",
+          "venue": "TESTEX",
+          "bid": 5487,
+          "ask": 199558,
+          "bidSize": 89,
+          "askSize": 510,
+          "bidDepth": 698366,
+          "askDepth": 12960,
+          "last": 5487,
+          "lastSize": 1,
+          "lastTrade": "2015-12-25T16:57:10.89108839Z",
+          "quoteTime": "2015-12-25T17:05:19.679133216Z"
+        }
+    http_version: 
+  recorded_at: Fri, 25 Dec 2015 17:07:33 GMT
+recorded_with: VCR 3.0.1

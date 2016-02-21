@@ -1,0 +1,304 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.stockfighter.io/ob/api/venues/TESTEX/stocks/FOOBAR
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Stockfighter-Authorization:
+      - 133154ad29c9c864705a2ee581f4e945ef07541d
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.8.0
+      Date:
+      - Fri, 25 Dec 2015 16:55:35 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "ok": true,
+          "venue": "TESTEX",
+          "symbol": "FOOBAR",
+          "ts": "2015-12-25T16:55:34.699438654Z",
+          "bids": [
+            {
+              "price": 5487,
+              "qty": 90,
+              "isBuy": true
+            },
+            {
+              "price": 5330,
+              "qty": 100000,
+              "isBuy": true
+            },
+            {
+              "price": 5330,
+              "qty": 100000,
+              "isBuy": true
+            },
+            {
+              "price": 5319,
+              "qty": 100000,
+              "isBuy": true
+            },
+            {
+              "price": 5104,
+              "qty": 100000,
+              "isBuy": true
+            },
+            {
+              "price": 5000,
+              "qty": 100000,
+              "isBuy": true
+            },
+            {
+              "price": 1121,
+              "qty": 1111,
+              "isBuy": true
+            },
+            {
+              "price": 121,
+              "qty": 111,
+              "isBuy": true
+            },
+            {
+              "price": 121,
+              "qty": 111,
+              "isBuy": true
+            },
+            {
+              "price": 100,
+              "qty": 10,
+              "isBuy": true
+            },
+            {
+              "price": 100,
+              "qty": 10,
+              "isBuy": true
+            },
+            {
+              "price": 11,
+              "qty": 96170,
+              "isBuy": true
+            },
+            {
+              "price": 11,
+              "qty": 100000,
+              "isBuy": true
+            },
+            {
+              "price": 11,
+              "qty": 10,
+              "isBuy": true
+            },
+            {
+              "price": 2,
+              "qty": 5,
+              "isBuy": true
+            },
+            {
+              "price": 1,
+              "qty": 5,
+              "isBuy": true
+            },
+            {
+              "price": 1,
+              "qty": 5,
+              "isBuy": true
+            },
+            {
+              "price": 0,
+              "qty": 110,
+              "isBuy": true
+            },
+            {
+              "price": 0,
+              "qty": 110,
+              "isBuy": true
+            },
+            {
+              "price": 0,
+              "qty": 499,
+              "isBuy": true
+            }
+          ],
+          "asks": [
+            {
+              "price": 199558,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199569,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199584,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199603,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199620,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199691,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199696,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199702,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199737,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199743,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199777,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199792,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199819,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 199945,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 200032,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 200041,
+              "qty": 510,
+              "isBuy": false
+            },
+            {
+              "price": 200072,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200074,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200078,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200095,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200096,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200098,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200099,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200101,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200102,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200104,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200107,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200108,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200108,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200110,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200111,
+              "qty": 300,
+              "isBuy": false
+            },
+            {
+              "price": 200141,
+              "qty": 300,
+              "isBuy": false
+            }
+          ]
+        }
+    http_version: 
+  recorded_at: Fri, 25 Dec 2015 16:55:20 GMT
+recorded_with: VCR 3.0.1

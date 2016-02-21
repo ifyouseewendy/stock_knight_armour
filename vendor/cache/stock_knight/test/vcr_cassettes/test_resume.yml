@@ -1,0 +1,34 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://www.stockfighter.io/gm/instances/7557/resume
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Stockfighter-Authorization:
+      - 133154ad29c9c864705a2ee581f4e945ef07541d
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.8.0
+      Date:
+      - Fri, 25 Dec 2015 16:46:26 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '49'
+      Connection:
+      - keep-alive
+      X-Upstream-Debugging:
+      - default
+    body:
+      encoding: UTF-8
+      string: '{"ok":false,"error":"Level instance not running"}'
+    http_version: 
+  recorded_at: Fri, 25 Dec 2015 16:46:11 GMT
+recorded_with: VCR 3.0.1
