@@ -19,8 +19,8 @@ class Dealer
 
     @profit = profit
     @share  = share
-    @self_profit = Profit.new
-    @transaction_count = Profit.new
+    @self_profit = Counter.new
+    @transaction_count = Counter.new
     @index  = 0
   end
 

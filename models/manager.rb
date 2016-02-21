@@ -12,8 +12,8 @@ class Manager
     @counter    = 0
     @start_time = Time.now.to_i
 
-    @profit     = Profit.new
-    @share      = Profit.new
+    @profit     = Counter.new
+    @share      = Counter.new
     @dealers    = DEALER.times.map{ Dealer.new(@profit, @share) }
   end
 

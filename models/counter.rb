@@ -1,6 +1,6 @@
 require 'concurrent'
 
-class Profit
+class Counter
   def initialize
     @counter = Concurrent::AtomicFixnum.new(0)
   end
