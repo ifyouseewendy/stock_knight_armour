@@ -19,14 +19,14 @@ class Dealer
 
     @profit = profit
     @share  = share
-    @self_profit = Counter.new
-    @transaction_count = Counter.new
+    @self_profit = DbCounter.new(:self_profit)
+    @transaction_count = DbCounter.new(:transaction_count)
     @index  = 0
   end
 
   def valid_share_value
     share_now = share.value
-    if share_now.abs > (1000 - Mangager::SHARE - 50)
+    if share_now.abs > (1000 - Manager::SHARE - 50)
       puts "#{id} --> sell skip, current share: #{share_now}"
       false
     else
