@@ -12,9 +12,10 @@ class Manager
     @counter    = 0
     @start_time = Time.now.to_i
 
-    @profit     = DbCounter.new(:profit)
-    @share      = DbCounter.new(:share)
-    @dealers    = DEALER.times.with_index.map{|i, _| Dealer.new(i, @profit, @share) }
+    @profit     = DbCounter.new('profit_total')
+    @share      = DbCounter.new('share_total')
+    @round      = DbCounter.new('round_total')
+    @dealers    = DEALER.times.with_index.map{|i, _| Dealer.new(i, @profit, @share, @round) }
   end
 
   def dispatch

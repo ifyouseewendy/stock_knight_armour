@@ -4,16 +4,18 @@ require 'stock_knight'
 class Dealer
   include Celluloid
 
-  attr_reader :client, :stock, :profit, :share, :index
+  attr_reader :client, :stock, :profit, :share, :round, :index
 
-  def initialize(index, profit, share)
+  def initialize(index, profit, share, round)
     initialize_client
 
     @index  = index
     @profit = profit
     @share  = share
-    @self_profit = DbCounter.new("self_profit_#{index}")
-    @transaction_count = DbCounter.new("transaction_count_#{index}")
+    @round  = round
+    @self_profit = DbCounter.new("profit_#{index}")
+    @self_share = DbCounter.new("share_#{index}")
+    @self_round = DbCounter.new("round_#{index}")
   end
 
   def initialize_client
@@ -201,13 +203,17 @@ class Dealer
     end
 
     value = base - sum
+
     profit.increment_by(value)
-    share.increment_by( init_qty )
+    share.increment_by(init_qty)
+    round.increment_by(1)
+
     @self_profit.increment_by(value)
-    @transaction_count.increment_by(1)
+    @self_share.increment_by(init_qty)
+    @self_round.increment_by(1)
 
     value = "+#{value}" if value >= 0
-    puts "#{id} --> share: #{share.value} profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, transaction_count: #{@transaction_count.value})"
+    puts "#{id} --> share: #{share.value} profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, self_round: #{@self_round.value})"
   end
 
   def sell(type:, price:, qty:)
@@ -277,13 +283,17 @@ class Dealer
     end
 
     value = sum - base
+
     profit.increment_by(value)
     share.increment_by( 0 - init_qty )
+    round.increment_by(1)
+
     @self_profit.increment_by(value)
-    @transaction_count.increment_by(1)
+    @self_share.increment_by( 0 - init_qty )
+    @self_round.increment_by(1)
 
     value = "+#{value}" if value >= 0
-    puts "#{id} --> share: #{share.value} profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, transaction_count: #{@transaction_count.value})"
+    puts "#{id} --> share: #{share.value} profit: #{profit.value} (#{value}, self_profit: #{@self_profit.value}, self_round: #{@self_round.value})"
   end
 
 end
