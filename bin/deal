@@ -7,6 +7,17 @@ require File.expand_path('../../models/models', __FILE__)
 
 manager = Manager.new
 
+count = Quote.count
+flag = false
+
 loop do
-  manager.deal
+  manager.dispatch
+
+  if flag
+    manager.deal
+  else
+    if Quote.count - count > 6
+      flag = true
+    end
+  end
 end
