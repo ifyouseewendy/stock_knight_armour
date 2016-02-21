@@ -20,7 +20,7 @@ class DbCounter
     criteria.first.counter
   end
 
-  def clear
+  def self.destroy_all
     MetaCounter.destroy_all
   end
 end

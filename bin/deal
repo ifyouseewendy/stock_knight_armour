@@ -5,6 +5,13 @@ require 'mongoid'
 Mongoid.load!("config/mongoid.yml", :development)
 require File.expand_path('../../models/models', __FILE__)
 
+if ARGV[0] == 'new'
+  puts "--> Cleaning"
+
+  DbCounter.destroy_all
+  Quote.destroy_all
+end
+
 manager = Manager.new
 
 count = Quote.count
