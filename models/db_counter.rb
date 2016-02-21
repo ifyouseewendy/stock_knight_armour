@@ -1,3 +1,5 @@
+require 'terminal-table'
+
 class DbCounter
   class MetaCounter
     include Mongoid::Document
@@ -20,7 +22,26 @@ class DbCounter
     criteria.first.counter
   end
 
-  def self.destroy_all
-    MetaCounter.destroy_all
+  class << self
+    def destroy_all
+      MetaCounter.destroy_all
+    end
+
+    def stats
+      fields = ['round', 'share', 'profit']
+      table = Terminal::Table.new do |t|
+        t << [''] + fields
+        t << :separator
+        ( ['total'] + (0..Manager::DEALER-1).to_a ).each do |id|
+          row = [id]
+          fields.each do |field|
+            row << MetaCounter.where(name: "#{field}_#{id}").first.try(:counter)
+          end
+          t << row
+        end
+      end
+
+      puts table
+    end
   end
 end
