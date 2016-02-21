@@ -2,7 +2,8 @@ class Manager
   attr_reader :fetcher, :processor, :dealers, :start_time
   attr_accessor :counter, :profit, :share
 
-  DEALER_COUNT = 8
+  DEALER = 8
+  SHARE = 250
 
   def initialize
     @fetcher    = Fetcher.pool(size: 2, args: self)   # size default to system cores count
@@ -13,7 +14,7 @@ class Manager
 
     @profit     = Profit.new
     @share      = Profit.new
-    @dealers    = DEALER_COUNT.times.map{ Dealer.new(@profit, @share) }
+    @dealers    = DEALER.times.map{ Dealer.new(@profit, @share) }
   end
 
   def dispatch

@@ -4,8 +4,6 @@ require 'stock_knight'
 class Dealer
   include Celluloid
 
-  SHARE = 250
-
   attr_reader :client, :stock, :profit, :share
 
   def initialize(profit, share)
@@ -28,7 +26,7 @@ class Dealer
 
   def valid_share_value
     share_now = share.value
-    if share_now.abs > 700
+    if share_now.abs > (1000 - Mangager::SHARE - 50)
       puts "#{id} --> sell skip, current share: #{share_now}"
       false
     else
@@ -46,7 +44,7 @@ class Dealer
 
     bid = ( price * 100 * 0.7 ).to_i
 
-    amount, fill_price = buy(type: :limit, price: bid, qty: SHARE)
+    amount, fill_price = buy(type: :limit, price: bid, qty: Manager::SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
@@ -65,7 +63,7 @@ class Dealer
 
     ask = ( price * 100 * 1.3 ).to_i
 
-    amount, fill_price = sell(type: :limit, price: ask, qty: SHARE)
+    amount, fill_price = sell(type: :limit, price: ask, qty: Manager::SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
@@ -82,13 +80,13 @@ class Dealer
 
     @index = index
 
-    bid_rate, bid_share = 1, (0.04/Manager::DEALER_COUNT)
+    bid_rate, bid_share = 1, (0.04/Manager::DEALER)
     bid_rate -= index * bid_share
     bid = ( price * 100 * bid_rate ).to_i
 
     return if bid == 0
 
-    amount, fill_price = buy(type: :limit, price: bid, qty: SHARE)
+    amount, fill_price = buy(type: :limit, price: bid, qty: Manager::SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
@@ -105,13 +103,13 @@ class Dealer
 
     @index = index
 
-    ask_rate, ask_share = 1, (0.04/Manager::DEALER_COUNT)
+    ask_rate, ask_share = 1, (0.04/Manager::DEALER)
     ask_rate += index * ask_share
     ask = ( price * 100 * ask_rate ).to_i
 
     return if ask == 0
 
-    amount, fill_price = sell(type: :limit, price: ask, qty: SHARE)
+    amount, fill_price = sell(type: :limit, price: ask, qty: Manager::SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
