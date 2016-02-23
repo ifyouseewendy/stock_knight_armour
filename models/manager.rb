@@ -2,15 +2,9 @@ class Manager
   attr_reader :fetcher, :processor, :dealers, :start_time
   attr_accessor :counter, :profit, :share
 
-  FETCHER = 4
-  PROCESSOR = 2
-
-  DEALER = 8
-  SHARE = 250
-
   def initialize(dealer)
-    @fetcher    = Fetcher.pool(size: FETCHER, args: self)   # size default to system cores count
-    @processor  = Processor.pool(size: PROCESSOR)
+    @fetcher    = Fetcher.pool(size: Configuration::FETCHER, args: self)   # size default to system cores count
+    @processor  = Processor.pool(size: Configuration::PROCESSOR)
 
     @counter    = 0
     @start_time = Time.now.to_i
@@ -20,7 +14,7 @@ class Manager
     @round      = DbCounter.new('round_total')
 
     klass = dealer.to_s.camelcase.constantize
-    @dealers    = DEALER.times.with_index.map{|i, _| klass.new(i, @profit, @share, @round) }
+    @dealers    = Configuration::DEALER.times.with_index.map{|i, _| klass.new(i, @profit, @share, @round) }
   end
 
   def dispatch

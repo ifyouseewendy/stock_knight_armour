@@ -32,7 +32,7 @@ class Dealer
 
   def valid_share_value
     share_now = share.value
-    if share_now.abs > (1000 - Manager::SHARE - 50)
+    if share_now.abs > (1000 - Configuration::SHARE - 50)
       puts "#{id} --> sell skip, current share: #{share_now}"
       false
     else

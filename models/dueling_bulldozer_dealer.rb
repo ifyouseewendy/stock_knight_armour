@@ -7,7 +7,7 @@ class DuelingBulldozerDealer < Dealer
 
     bid = ( price * 100 * 0.7 ).to_i
 
-    amount, fill_price = buy(type: :limit, price: bid, qty: Manager::SHARE)
+    amount, fill_price = buy(type: :limit, price: bid, qty: Configuration::SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
@@ -24,7 +24,7 @@ class DuelingBulldozerDealer < Dealer
 
     ask = ( price * 100 * 1.3 ).to_i
 
-    amount, fill_price = sell(type: :limit, price: ask, qty: Manager::SHARE)
+    amount, fill_price = sell(type: :limit, price: ask, qty: Configuration::SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
@@ -39,13 +39,13 @@ class DuelingBulldozerDealer < Dealer
     price = Quote.good_price(based_on: :ask)
     return if price.zero?
 
-    bid_rate, bid_share = 1, (0.04/Manager::DEALER)
+    bid_rate, bid_share = 1, (0.04/Configuration::DEALER)
     bid_rate -= index * bid_share
     bid = ( price * 100 * bid_rate ).to_i
 
     return if bid == 0
 
-    amount, fill_price = buy(type: :limit, price: bid, qty: Manager::SHARE)
+    amount, fill_price = buy(type: :limit, price: bid, qty: Configuration::SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price
@@ -60,13 +60,13 @@ class DuelingBulldozerDealer < Dealer
     price = Quote.good_price(based_on: :bid)
     return if price.zero?
 
-    ask_rate, ask_share = 1, (0.04/Manager::DEALER)
+    ask_rate, ask_share = 1, (0.04/Configuration::DEALER)
     ask_rate += index * ask_share
     ask = ( price * 100 * ask_rate ).to_i
 
     return if ask == 0
 
-    amount, fill_price = sell(type: :limit, price: ask, qty: Manager::SHARE)
+    amount, fill_price = sell(type: :limit, price: ask, qty: Configuration::SHARE)
     return 0 if amount.zero?
 
     base = amount * fill_price

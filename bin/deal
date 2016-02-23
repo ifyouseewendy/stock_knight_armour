@@ -12,18 +12,24 @@ if ARGV[0] == 'new'
   Quote.destroy_all
 end
 
+class Configuration
+  FETCHER   = 4
+  PROCESSOR = 2
+  DEALER    = 8
+  SHARE     = 250
+end
+
 manager = Manager.new(:dueling_bulldozer_dealer)
 
+puts "--> Starting sampling"
 count = Quote.count
-
 loop do
-  puts "--> Starting sampling"
   manager.dispatch
   break if Quote.count - count >= 6
 end
 
+puts "--> Starting dealing"
 loop do
-  puts "--> Starting dealing"
   manager.dispatch
 
   manager.deal do |dealers|
