@@ -5,7 +5,7 @@ require 'mongoid'
 Mongoid.load!("config/mongoid.yml", :development)
 require File.expand_path('../../models/models', __FILE__)
 
-manager = Manager.new
+manager = Manager.new(:dueling_bulldozer_dealer)
 manager.clean_db
 
 loop do

@@ -12,19 +12,29 @@ if ARGV[0] == 'new'
   Quote.destroy_all
 end
 
-manager = Manager.new
+manager = Manager.new(:dueling_bulldozer_dealer)
 
 count = Quote.count
-flag = false
 
 loop do
+  puts "--> Starting sampling"
+  manager.dispatch
+  break if Quote.count - count >= 6
+end
+
+loop do
+  puts "--> Starting dealing"
   manager.dispatch
 
-  if flag
-    manager.deal
-  else
-    if Quote.count - count > 6
-      flag = true
+  manager.deal do |dealers|
+    dealers.each_with_index do |dealer, idx|
+      if idx.even?
+        dealer.async.deal_buy_low_first
+        # dealer.async.deal_buy_first
+      else
+        dealer.async.deal_sell_high_first
+        # dealer.async.deal_sell_first
+      end
     end
   end
 end

@@ -8,7 +8,7 @@ class Manager
   DEALER = 8
   SHARE = 250
 
-  def initialize
+  def initialize(dealer)
     @fetcher    = Fetcher.pool(size: FETCHER, args: self)   # size default to system cores count
     @processor  = Processor.pool(size: PROCESSOR)
 
@@ -18,7 +18,9 @@ class Manager
     @profit     = DbCounter.new('profit_total')
     @share      = DbCounter.new('share_total')
     @round      = DbCounter.new('round_total')
-    @dealers    = DEALER.times.with_index.map{|i, _| Dealer.new(i, @profit, @share, @round) }
+
+    klass = dealer.to_s.camelcase.constantize
+    @dealers    = DEALER.times.with_index.map{|i, _| klass.new(i, @profit, @share, @round) }
   end
 
   def dispatch
@@ -44,15 +46,7 @@ class Manager
   end
 
   def deal
-    dealers.each_with_index do |dealer, idx|
-      if idx.even?
-        dealer.async.deal_buy_low_first
-        # dealer.async.deal_buy_first
-      else
-        dealer.async.deal_sell_high_first
-        # dealer.async.deal_sell_first
-      end
-    end
+    yield dealers
   end
 
   def clean_db
