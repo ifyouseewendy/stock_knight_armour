@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require 'mongoid'
+Mongoid.load!("config/mongoid.yml", :development)
+require File.expand_path('../../models/models', __FILE__)
+
+if ARGV[0] == 'new'
+  puts "--> Cleaning"
+
+  DbCounter.destroy_all
+  Quote.destroy_all
+end
+
+manager = Manager.new
+
+count = Quote.count
+flag = false
+
+loop do
+  manager.dispatch
+
+  if flag
+    manager.deal
+  else
+    if Quote.count - count > 6
+      flag = true
+    end
+  end
+end

@@ -2,12 +2,15 @@ class Manager
   attr_reader :fetcher, :processor, :dealers, :start_time
   attr_accessor :counter, :profit, :share
 
+  FETCHER = 4
+  PROCESSOR = 2
+
   DEALER = 8
   SHARE = 250
 
   def initialize
-    @fetcher    = Fetcher.pool(size: 2, args: self)   # size default to system cores count
-    @processor  = Processor.pool(size: 2)
+    @fetcher    = Fetcher.pool(size: FETCHER, args: self)   # size default to system cores count
+    @processor  = Processor.pool(size: PROCESSOR)
 
     @counter    = 0
     @start_time = Time.now.to_i
