@@ -17,8 +17,8 @@ class Quote
   class << self
     # buy first use based_on: :ask
     # sell first use based_on: :bid
-    def good_price(based_on:)
-      return 0 if Quote.count < 3
+    def good_price(based_on:, sample_count: 3)
+      return 0 if Quote.count < sample_count
 
       sample = Quote.order_by(lastTrade: :desc).limit(6)
       last_price = sample.first.try(based_on)

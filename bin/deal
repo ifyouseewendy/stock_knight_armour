@@ -13,19 +13,19 @@ if ARGV[0] == 'new'
 end
 
 class Configuration
-  FETCHER   = 4
+  FETCHER   = 2
   PROCESSOR = 2
   DEALER    = 8
   SHARE     = 250
 end
 
-manager = Manager.new(:dueling_bulldozer_dealer)
+manager = Manager.new(:irrational_exuberance_dealer)
 
 puts "--> Starting sampling"
 count = Quote.count
 loop do
   manager.dispatch
-  break if Quote.count - count >= 6
+  break if Quote.count - count >= 1
 end
 
 puts "--> Starting dealing"
@@ -34,13 +34,7 @@ loop do
 
   manager.deal do |dealers|
     dealers.each_with_index do |dealer, idx|
-      if idx.even?
-        dealer.async.deal_buy_low_first
-        # dealer.async.deal_buy_first
-      else
-        dealer.async.deal_sell_high_first
-        # dealer.async.deal_sell_first
-      end
+      dealer.async.deal_buy_first
     end
   end
 end

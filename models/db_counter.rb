@@ -19,7 +19,7 @@ class DbCounter
   end
 
   def value
-    criteria.first.counter
+    criteria.first.try(:counter) || 0
   end
 
   class << self
