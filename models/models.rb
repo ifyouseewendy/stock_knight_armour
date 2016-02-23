@@ -1,5 +1,6 @@
 require_relative 'array_pacth'
 require_relative 'dealer'
+require_relative 'dueling_bulldozer_dealer'
 require_relative 'fetcher'
 require_relative 'manager'
 require_relative 'processor'
