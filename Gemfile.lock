@@ -90,6 +90,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
   celluloid
   concurrent-ruby
   dotenv
