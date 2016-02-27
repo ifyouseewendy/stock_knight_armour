@@ -4,10 +4,10 @@ class IrrationalExuberanceDealer < Dealer
     amount, fill_price = buy(type: :limit, price: price, qty: Configuration::SHARE)
     return false if amount.zero?
 
-    # base = amount * fill_price
-    # ask_price = price
-    #
-    # sell_block(type: :limit, price: ask_price, qty: amount, base: base)
+    base = amount * fill_price
+    ask_price = (price * 1.2).to_i
+
+    sell_block(type: :limit, price: ask_price, qty: amount, base: base)
     return true
   end
 
@@ -16,10 +16,10 @@ class IrrationalExuberanceDealer < Dealer
     amount, fill_price = sell(type: :limit, price: price, qty: Configuration::SHARE)
     return false if amount.zero?
 
-    # base = amount * fill_price
-    # bid_price = price
-    #
-    # buy_block(type: :limit, price: bid_price, qty: amount, base: base)
+    base = amount * fill_price
+    bid_price = (price * 0.8).to_i
+
+    buy_block(type: :limit, price: bid_price, qty: amount, base: base)
     return true
   end
 

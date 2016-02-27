@@ -15,8 +15,8 @@ end
 class Configuration
   FETCHER   = 2
   PROCESSOR = 2
-  DEALER    = 4
-  SHARE     = 500
+  DEALER    = 8
+  SHARE     = 250
 end
 
 def good_price(based_on:, sample_count:)
@@ -37,29 +37,53 @@ end
 
 start_price = 0
 while start_price.zero?
-  start_price = ( good_price(based_on: :bid, sample_count: 1) * 100 * 1.2 ).to_i
+  start_price = ( good_price(based_on: :bid, sample_count: 1) * 100 * 1.1 ).to_i
 end
 puts "--> Get start_price: #{start_price}"
 
-target_price = 10*(start_price + 100)
+target_price = 100*(start_price + 100_000)
 
-i = 0
+puts "#"*40
+puts "--> Raising"
+price = start_price
+futures = []
 loop do
-  price = i.even? ? target_price : start_price
-  i += 1
+  manager.deal do |dealers|
+    dealers.each_with_index do |dealer, idx|
+      futures << dealer.future.buy_first_nail_price(to: price)
 
+      # if idx.even?
+      #   dealer.async.buy_first_nail_price(to: price)
+      # else
+      #   dealer.async.sell_first_nail_price(to: price)
+      # end
+    end
+  end
+
+  break if price > target_price
+
+  price = (price * 2).to_i
+end
+
+begin
+  futures.each(&:value)
+rescue => e
+  puts e.message
+end
+
+puts "#"*40
+puts "--> Depressing"
+price = start_price
+loop do
   manager.deal do |dealers|
     dealers.each_with_index do |dealer, idx|
       if idx.even?
         dealer.async.buy_first_nail_price(to: price)
-        dealer.async.buy_first_nail_price(to: start_price)
       else
         dealer.async.sell_first_nail_price(to: price)
-        dealer.async.sell_first_nail_price(to: target_price)
       end
     end
   end
-
 end
 
 watcher.join
