@@ -15,26 +15,51 @@ end
 class Configuration
   FETCHER   = 2
   PROCESSOR = 2
-  DEALER    = 8
-  SHARE     = 250
+  DEALER    = 4
+  SHARE     = 500
 end
+
+def good_price(based_on:, sample_count:)
+  return 0 if Quote.count < sample_count
+
+  Quote.order_by(lastTrade: :desc).first.try(based_on)
+end
+
 
 manager = Manager.new(:irrational_exuberance_dealer)
 
-puts "--> Starting sampling"
-count = Quote.count
-loop do
-  manager.dispatch
-  break if Quote.count - count >= 1
+puts '--> Start watching'
+watcher = Thread.new do
+  loop do
+    manager.dispatch
+  end
 end
 
-puts "--> Starting dealing"
+start_price = 0
+while start_price.zero?
+  start_price = ( good_price(based_on: :bid, sample_count: 1) * 100 * 1.2 ).to_i
+end
+puts "--> Get start_price: #{start_price}"
+
+target_price = 10*(start_price + 100)
+
+i = 0
 loop do
-  manager.dispatch
+  price = i.even? ? target_price : start_price
+  i += 1
 
   manager.deal do |dealers|
     dealers.each_with_index do |dealer, idx|
-      dealer.async.deal_buy_first
+      if idx.even?
+        dealer.async.buy_first_nail_price(to: price)
+        dealer.async.buy_first_nail_price(to: start_price)
+      else
+        dealer.async.sell_first_nail_price(to: price)
+        dealer.async.sell_first_nail_price(to: target_price)
+      end
     end
   end
+
 end
+
+watcher.join
