@@ -84,7 +84,13 @@ class Dealer
     else
       fill_price = (fill_sum/fill_qty.to_f).to_i
       puts "#{id} --> bought #{fill_qty} at #{fill_price}"
+
       share.increment_by( fill_qty )
+      profit.increment_by( 0 - fill_qty*fill_price )
+
+      @self_share.increment_by( fill_qty )
+      @self_profit.increment_by( 0 - fill_qty*fill_price )
+
       return fill_qty, fill_price
     end
   end
@@ -128,11 +134,11 @@ class Dealer
 
     value = base - sum
 
-    profit.increment_by(value)
+    profit.increment_by(sum)
     share.increment_by(init_qty)
     round.increment_by(1)
 
-    @self_profit.increment_by(value)
+    @self_profit.increment_by(sum)
     @self_share.increment_by(init_qty)
     @self_round.increment_by(1)
 
@@ -164,7 +170,13 @@ class Dealer
     else
       fill_price = (fill_sum/fill_qty.to_f).to_i
       puts "#{id} --> sold #{fill_qty} at #{fill_price}"
+
       share.increment_by( 0 - fill_qty )
+      profit.increment_by( fill_qty*fill_price )
+
+      @self_share.increment_by( 0 - fill_qty )
+      @self_profit.increment_by( fill_qty*fill_price )
+
       return fill_qty, fill_price
     end
   end
@@ -208,11 +220,11 @@ class Dealer
 
     value = sum - base
 
-    profit.increment_by(value)
+    profit.increment_by(sum)
     share.increment_by( 0 - init_qty )
     round.increment_by(1)
 
-    @self_profit.increment_by(value)
+    @self_profit.increment_by(sum)
     @self_share.increment_by( 0 - init_qty )
     @self_round.increment_by(1)
 
