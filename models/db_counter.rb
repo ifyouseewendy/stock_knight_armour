@@ -32,7 +32,8 @@ class DbCounter
       table = Terminal::Table.new do |t|
         t << [''] + fields
         t << :separator
-        ( ['total'] + (0..Configuration::DEALER-1).to_a ).each do |id|
+        count = (MetaCounter.count / 3) - 1
+        ( ['total'] + (0...count).to_a ).each do |id|
           row = [id]
           fields.each do |field|
             row << MetaCounter.where(name: "#{field}_#{id}").first.try(:counter)
